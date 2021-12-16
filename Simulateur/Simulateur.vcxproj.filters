@@ -25,6 +25,9 @@
     <Filter Include="Fichiers de ressources\fonts">
       <UniqueIdentifier>{29365d68-4cbb-4b14-bf54-f0dbcf340158}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Fichiers d%27en-tête\glm">
+      <UniqueIdentifier>{9c0e91ee-2161-4be6-8ab0-b16d787e2bd4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Simulateur.cpp">
@@ -131,6 +134,75 @@
     <ClInclude Include="Line.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
+    <ClInclude Include="glm\common.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\exponential.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\ext.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\fwd.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\geometric.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\glm.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\integer.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\mat2x2.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\mat2x3.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\mat2x4.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\mat3x2.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\mat3x3.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\mat3x4.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\mat4x2.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\mat4x3.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\mat4x4.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\matrix.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\packing.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\trigonometric.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\vec2.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\vec3.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\vec4.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
+    <ClInclude Include="glm\vector_relational.hpp">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="SimpleFragmentShader.fragmentshader">
@@ -145,6 +217,12 @@
     <None Include="default.vert">
       <Filter>Fichiers de ressources\shaders</Filter>
     </None>
+    <None Include="ligne.frag">
+      <Filter>Fichiers de ressources\shaders</Filter>
+    </None>
+    <None Include="ligne.vert">
+      <Filter>Fichiers de ressources\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Simulateur.rc">
@@ -155,5 +233,10 @@
     <Font Include="..\x64\Debug\Roboto-Regular.ttf">
       <Filter>Fichiers de ressources\fonts</Filter>
     </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="glm\CMakeLists.txt">
+      <Filter>Fichiers d%27en-tête\glm</Filter>
+    </Text>
   </ItemGroup>
 </Project>

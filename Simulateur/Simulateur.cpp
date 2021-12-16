@@ -12,6 +12,8 @@
 #include "imgui_impl_opengl3.h"
 #include "MenuConnexion.h"
 #include "menuVoiture.h"
+#include "Line.h"
+#include "glm/vec2.hpp"
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
@@ -19,7 +21,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 void window_size_callback(GLFWwindow* window, int width, int height)
 {
-	glfwSetWindowSize(window,width, width/1.25f);
+	if (height < 100)
+		height = 100;
+	glfwSetWindowSize(window,width, (int)(width/1.25f));
+	glViewport(0, 0, width, (int)(width / 1.25f));
 }
 
 void HideConsole()
@@ -43,6 +48,37 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 }
 
+void tournerVecteur(glm::vec2 *v, float angle) {
+	float x2 = v->x * cos(angle) - v->y * sin(angle);
+	float y2 = v->x * sin(angle) + v->y * cos(angle);
+	v->x = x2;
+	v->y = y2;
+}
+glm::vec2 rayCast(glm::vec2 wp1,glm::vec2 wp2,glm::vec2 rayStart,glm::vec2 rayDirection) {
+	const float x1 = wp1.x;
+	const float y1 = wp1.y;
+	const float x2 = wp2.x;
+	const float y2 = wp2.y;
+
+	const float x3 = rayStart.x;
+	const float y3 = rayStart.y;
+	const float x4 = rayStart.x + rayDirection.x;
+	const float y4 = rayStart.y + rayDirection.y;
+
+	const float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+	if (den == 0) {
+		return glm::vec2(-2.f,-2.f);
+	}
+
+	const float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
+	const float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
+	if (t > 0 && t < 1 && u > 0) {
+		return glm::vec2(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+	}
+	else {
+		return glm::vec2(-2.f, -2.f);
+	}
+}
 // Vertices coordinates
 GLfloat vertices[] =
 {
@@ -53,14 +89,6 @@ GLfloat vertices[] =
 	0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner right
 	0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f // Inner down
 };
-GLfloat linesVertices[] =
-{
-	0.2f,2.0f,0.0f,
-	0.1f,0.05f,0.0f,
-	1.0f,0.02f,0.0f,
-	0.8f,0.2f,0.0f
-};
-
 // Indices for vertices order
 GLuint indices[] =
 {
@@ -71,12 +99,27 @@ GLuint indices[] =
 
 GLuint linesIndices[] =
 {
-	0,1,0,1
+	0,1,2,3,4,5
 };
 
 
 int main()
 {
+	Line::initLines();
+	Line::drawLine(glm::vec2(0.0f, 0.0f), glm::vec2(1.f, 0.0f), ImVec4(1.f, 2.f, 3.f,1.f));
+	Line::drawLine(glm::vec2(0.0f, 0.0f), glm::vec2(0.f, 1.0f), ImVec4(1.f, 2.f, 3.f, 1.f));
+	Line::drawLine(glm::vec2(0.f, 0.f), glm::vec2(-0.2f, 0.5f), ImVec4(1.f, 2.f, 3.f, 1.f));
+	Line::drawLine(glm::vec2(1.f, 0.5f), glm::vec2(-0.2f, 0.5f), ImVec4(1.f, 2.f, 3.f, 1.f)); //up
+
+	//Line::drawLine(glm::vec2(0.f, 0.0f), glm::vec2(0.0f, -0.9f), ImVec4(1.f, 2.f, 3.f, 1.f));
+	Line::drawLine(glm::vec2(0.99f, 0.0f), glm::vec2(0.99f, -0.9f), ImVec4(1.f, 2.f, 3.f, 1.f));
+	Line::drawLine(glm::vec2(0.0f, -0.9f), glm::vec2(1.f, -0.9f), ImVec4(1.f, 2.f, 3.f, 1.f));
+	glm::vec2 dir = glm::vec2(1.f, 1.f);
+	tournerVecteur(&dir, 0.1f);
+	glm::vec2 res = rayCast(glm::vec2(1.f,0.5f), glm::vec2(-0.2f,0.5f), glm::vec2(0.f,0.f), dir);
+	Line::drawLine(glm::vec2(0.f, 0.f), res, ImVec4(1.f, 1.f, 1.f, 1.f));
+
+	//Line::drawLine(glm::vec2(0.0f, 0.5f), glm::vec2(0.5, 0.0f), ImVec4(1.f, 2.f, 3.f, 1.f));
 
 	// Initialize GLFW
 	glfwInit();
@@ -89,7 +132,7 @@ int main()
 	// Tell GLFW we are using the CORE profile
 	// So that means we only have the modern functions
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
+	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
 	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
 	GLFWwindow* window = glfwCreateWindow(800, 800, "Simulateur Auto-mobile", NULL, NULL);
 	// Error check if the window fails to create
@@ -130,6 +173,7 @@ int main()
 
 	// Generates Shader object using shaders defualt.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
+	Shader shaderLigne("ligne.vert","ligne.frag");
 
 	// Generates Vertex Array Object and binds it
 	VAO VAO1;
@@ -149,8 +193,9 @@ int main()
 
 	VAO VAO2;
 	VAO2.Bind();
-	VBO VBO2(linesVertices, sizeof(linesVertices));
-	EBO EBO2(linesIndices, sizeof(linesIndices));
+	VBO VBO2(&Line::listeLignes.data()[0], Line::listeLignes.size()*sizeof(GLfloat));
+	EBO EBO2(&Line::listeIndices.data()[0], Line::number * 2 * sizeof(GLuint));
+	
 	VAO2.LinkVBO(VBO2, 0);
 	VAO2.Unbind();
 	VBO2.Unbind();
@@ -172,7 +217,7 @@ int main()
 	config.OversampleH = 2;
 	config.OversampleV = 1;
 	config.GlyphExtraSpacing.x = 1.0f;
-	io.Fonts->AddFontFromFileTTF("Roboto-Regular.ttf", 18.0f,&config);
+	io.Fonts->AddFontFromFileTTF("Roboto-Regular.ttf", 18.0f,&config); 
 
 
 	while (!glfwWindowShouldClose(window))
@@ -188,15 +233,17 @@ int main()
 		
 		// Tell OpenGL which Shader Program we want to use
 		shaderProgram.Activate();
-
 		// Bind the VAO so OpenGL knows to use it
 		VAO1.Bind();
 		// Draw primitives, number of indices, datatype of indices, index of indices
+		shaderProgram.Activate();
 		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
 		//VAO1.Unbind();
 		VAO2.Bind();
-		glDrawElements(GL_LINES, 4, GL_UNSIGNED_INT,0);
-		//VAO2.Unbind();
+		shaderLigne.Activate();
+		glDrawElements(GL_LINES, Line::number*2, GL_UNSIGNED_INT,0);
+		VAO2.Unbind();
+		//Line::drawLine(glm::vec2(0.4f, 2.0f), glm::vec2(0.1f, 0.05f), ImVec4(1.f, 2.f, 3.f, 1.f));
 
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -233,10 +280,10 @@ int main()
 			static int counter = 0;
 			int width, height;
 			glfwGetWindowSize(window, &width, &height);
-			ImGui::SetNextWindowPos(ImVec2(width, height), ImGuiCond_FirstUseEver);
+			ImGui::SetNextWindowPos(ImVec2((float)width, (float)height), ImGuiCond_FirstUseEver);
 			ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
 
-			ImGui::Text("taille de la fenetre width : %d height : %d ",width,height);               // Display some text (you can use a format strings too)
+			ImGui::Text("taille de la fenetre width : %d height : %d ", (float)width, (float)height);               // Display some text (you can use a format strings too)
 			ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
 
 			ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f    
@@ -257,7 +304,7 @@ int main()
 
 			int width, height;
 			glfwGetWindowSize(window, &width, &height);
-			ImGui::SetNextWindowPos(ImVec2(50, 300), ImGuiCond_FirstUseEver);*/
+			ImGui::SetNextWindowPos(glm::vec2(50, 300), ImGuiCond_FirstUseEver);*/
 			handleMenuConnexion(&show_MenuConnexion);
 			handleMenuVoiture(&show_MenuConnexion);
 			
