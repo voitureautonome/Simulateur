@@ -157,8 +157,10 @@
     <ClCompile Include="libs\imguilib\imgui_tables.cpp" />
     <ClCompile Include="libs\imguilib\imgui_widgets.cpp" />
     <ClCompile Include="Line.cpp" />
+    <ClCompile Include="Main.cpp" />
     <ClCompile Include="MenuConnexion.cpp" />
     <ClCompile Include="menuVoiture.cpp" />
+    <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="shaderClass.cpp" />
     <ClCompile Include="Simulateur.cpp" />
@@ -181,6 +183,7 @@
     <ClInclude Include="Line.h" />
     <ClInclude Include="MenuConnexion.h" />
     <ClInclude Include="menuVoiture.h" />
+    <ClInclude Include="Mesh.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="shaderClass.h" />

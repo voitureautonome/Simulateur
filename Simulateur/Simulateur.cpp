@@ -7,6 +7,9 @@
 #include "VAO.h"
 #include "VBO.h"
 #include "EBO.h"
+#ifndef NOMINMAX
+# define NOMINMAX
+#endif
 #include <Windows.h>
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -21,7 +24,7 @@
 #include "Texture.h"
 #include "Camera.h"
 #include "windowUtils.h"
-
+#include "Mesh.h"
 void tournerVecteur(glm::vec2 *v, float angle) {
 	float x2 = v->x * cos(angle) - v->y * sin(angle);
 	float y2 = v->x * sin(angle) + v->y * cos(angle);
@@ -69,43 +72,31 @@ glm::vec3 triIntersect(glm::vec3 ro,glm::vec3 rd,glm::vec3 v0,glm::vec3 v1,glm::
 	return glm::vec3(t, u, v);
 }
 
-GLfloat vertices[] =
-{ //     COORDINATES     /        COLORS      /   TexCoord  //
-	-0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
-	-0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
-	 0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
-	 0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
+Vertex vertices[] =
+{ //               COORDINATES           /            COLORS          /           TexCoord         /       NORMALS         //
+	Vertex{glm::vec3(-1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+	Vertex{glm::vec3(-1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)},
+	Vertex{glm::vec3(1.0f, 0.0f,  1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 0.0f)}
 };
 
+// Indices for vertices order
 GLuint indices[] =
-{
-	0, 2, 1, 
-	0, 3, 2 
-};
-
-GLfloat verticesPyramide[] =
-{ //     COORDINATES     /        COLORS        /    TexCoord    /       NORMALS     //
-	-1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,		0.0f, 1.0f, 0.0f,
-	-1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 1.0f,		0.0f, 1.0f, 0.0f,
-	 1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 1.0f,		0.0f, 1.0f, 0.0f,
-	 1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 0.0f,		0.0f, 1.0f, 0.0f
-};
-GLuint indicesPyramide[] =
 {
 	0, 1, 2,
 	0, 2, 3
 };
 
-GLfloat lightVertices[] =
+Vertex lightVertices[] =
 { //     COORDINATES     //
-	-0.1f, -0.1f,  0.1f,
-	-0.1f, -0.1f, -0.1f,
-	 0.1f, -0.1f, -0.1f,
-	 0.1f, -0.1f,  0.1f,
-	-0.1f,  0.1f,  0.1f,
-	-0.1f,  0.1f, -0.1f,
-	 0.1f,  0.1f, -0.1f,
-	 0.1f,  0.1f,  0.1f
+	Vertex{glm::vec3(-0.1f, -0.1f,  0.1f)},
+	Vertex{glm::vec3(-0.1f, -0.1f, -0.1f)},
+	Vertex{glm::vec3(0.1f, -0.1f, -0.1f)},
+	Vertex{glm::vec3(0.1f, -0.1f,  0.1f)},
+	Vertex{glm::vec3(-0.1f,  0.1f,  0.1f)},
+	Vertex{glm::vec3(-0.1f,  0.1f, -0.1f)},
+	Vertex{glm::vec3(0.1f,  0.1f, -0.1f)},
+	Vertex{glm::vec3(0.1f,  0.1f,  0.1f)}
 };
 
 GLuint lightIndices[] =
@@ -189,65 +180,25 @@ int main()
 	gladLoadGL();
 	glViewport(0, 0, width, height);
 
+	Texture textures[]
+	{
+		Texture("planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
+	};
+
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
 	Shader shaderProgram("default.vert", "default.frag");
-	Shader shaderLigne("ligne.vert","ligne.frag");
+	std::vector <Vertex> verts(vertices, vertices + sizeof(vertices) / sizeof(Vertex));
+	std::vector <GLuint> ind(indices, indices + sizeof(indices) / sizeof(GLuint));
+	std::vector <Texture> tex(textures, textures + sizeof(textures) / sizeof(Texture));
+	Mesh floor(verts, ind, tex);
 
-	// Generates Vertex Array Object and binds it
-	VAO VAO1;
-	VAO1.Bind();
-
-	// Generates Vertex Buffer Object and links it to vertices
-	VBO VBO1(vertices, sizeof(vertices));
-	// Generates Element Buffer Object and links it to indices
-	EBO EBO1(indices, sizeof(indices));
-
-	// Links VBO to VAO
-	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
-	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-	// Unbind pour éviter de les modifier
-	VAO1.Unbind();
-	VBO1.Unbind();
-	EBO1.Unbind();
-
-	Texture voit("voiture.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
-	voit.texUnit(shaderProgram, "tex0", 0);
-	voit.texUnit(shaderProgram, "tex1", 1);
-
-	VAO VAOp;
-	VAOp.Bind();
-
-	VBO VBOp(verticesPyramide, sizeof(verticesPyramide));
-	EBO EBOp(indicesPyramide, sizeof(indicesPyramide));
-
-	VAOp.LinkAttrib(VBOp, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
-	VAOp.LinkAttrib(VBOp, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
-	VAOp.LinkAttrib(VBOp, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
-	VAOp.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
-
-	VAOp.Unbind();
-	VBOp.Unbind();
-	EBOp.Unbind();
-
-	Texture planTex("planks.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
-	planTex.texUnit(shaderProgram, "tex0", 0);
-	Texture planSpec("planksSpec.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
-	planSpec.texUnit(shaderProgram, "tex1", 1);
-
-	// Shader pour la spotlight cube
 	Shader lightShader("light.vert", "light.frag");
-	VAO lightVAO;
-	lightVAO.Bind();
-	VBO lightVBO(lightVertices, sizeof(lightVertices));
-	EBO lightEBO(lightIndices, sizeof(lightIndices));
-	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
-	lightVAO.Unbind();
-	lightVBO.Unbind();
-	lightEBO.Unbind();
-
-
+	std::vector <Vertex> lightVerts(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
+	std::vector <GLuint> lightInd(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(GLuint));
+	// Crate light mesh
+	Mesh light(lightVerts, lightInd, tex);
 
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
 	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
@@ -267,7 +218,7 @@ int main()
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
 	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
 
-
+	Shader shaderLigne("ligne.vert", "ligne.frag");
 	VAO VAO2;
 	VAO2.Bind();
 	VBO VBO2(&Line::listeLignes.data()[0], Line::listeLignes.size()*sizeof(GLfloat));
@@ -312,36 +263,20 @@ int main()
 		if (deltaTime < updateInterval) {
 			continue;
 		}
+		lastTime = time;
 		rotation += (float) 1.f * deltaTime;
 		lightModel = glm::rotate(lightModel, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
 		lightModel = glm::translate(lightModel, glm::vec3(0, 0.1*deltaTime, 0.0f));
 		lightShader.Activate();
 		glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
 
-		lastTime = time;
 		camera.Inputs(window);
 		camera.updateMatrix(45.0f, 0.1f, 100.0f);
 		shaderProgram.Activate();
 		glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightModel[3].x, lightModel[3].y, lightModel[3].z);
 		glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
-		camera.Matrix(shaderProgram, "camMatrix");
-
-		planTex.Bind();
-		planSpec.Bind();
-		VAOp.Bind();
-		glDrawElements(GL_TRIANGLES, sizeof(indicesPyramide)/sizeof(int), GL_UNSIGNED_INT, 0);
-		lightShader.Activate();
-		// Exporte la  matrice de camera vers le vertex shader de la lumiere
-		camera.Matrix(lightShader, "camMatrix");
-		lightVAO.Bind();
-		glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
-		planTex.Unbind();
-		planSpec.Unbind();
-		shaderProgram.Activate();
-		voit.Bind();
-		VAO1.Bind();
-
-		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, 0);
+		floor.Draw(shaderProgram,camera);
+		light.Draw(lightShader,camera);
 		
 		
 		//VAO1.Unbind();
@@ -434,12 +369,9 @@ int main()
 		// Clean the back buffer and assign the new color to it
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
-
-	VAO1.Delete();
-	VBO1.Delete();
-	EBO1.Delete();
 	shaderProgram.Delete();
-	voit.Delete();
+	lightShader.Delete();
+	shaderLigne.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program

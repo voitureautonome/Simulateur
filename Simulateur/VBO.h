@@ -4,6 +4,15 @@
 #include<glad/glad.h>
 #include <stdlib.h>
 #include <vector>
+#include<glm/glm.hpp>
+
+struct Vertex
+{
+	glm::vec3 position;
+	glm::vec3 normal;
+	glm::vec3 color;
+	glm::vec2 texUV;
+};
 
 class VBO
 {
@@ -14,10 +23,7 @@ public:
 	// Constructor that generates a Vertex Buffer Object and links it to vertices
 	VBO(GLfloat* vertices, GLsizeiptr size);
 	VBO(std::vector<GLfloat>* _vector, GLsizeiptr size);
-	~VBO()
-	{
-		glDeleteBuffers(1, &ID);
-	}
+	VBO(std::vector<Vertex>& vertices);
 
 	// Binds the VBO
 	void Bind();

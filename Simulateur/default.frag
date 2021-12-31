@@ -3,18 +3,19 @@
 // Outputs colors in RGBA
 out vec4 FragColor;
 
-
+// Imports the current position from the Vertex Shader
+in vec3 crntPos;
+in vec3 Normal;
 // Inputs the color from the Vertex Shader
 in vec3 color;
 // Inputs the texture coordinates from the Vertex Shader
 in vec2 texCoord;
-in vec3 Normal;
-// Imports the current position from the Vertex Shader
-in vec3 crntPos;
+
+
 
 // Gets the Texture Unit from the main function
-uniform sampler2D tex0;
-uniform sampler2D tex1;
+uniform sampler2D diffuse0;
+uniform sampler2D specular0;
 uniform vec3 lightColor;
 // Gets the position of the light from the main function
 uniform vec3 lightPos;
@@ -44,7 +45,7 @@ vec4 spotLight()
 	float angle = dot(vec3(0.0f, -1.0f, 0.0f), -lightDirection);
 	float inten = clamp((angle - outerCone) / (innerCone - outerCone), 0.0f, 1.0f);
 	vec4 fixlight = vec4(lightColor.x,lightColor.y,lightColor.z,1.0f); // créer un vecteur 4 a partir d'un vecteur 3 pour pouvoir le multiplier avec nos matrices 4 4
-	return (texture(tex0, texCoord) * (diffuse * inten + ambient) + texture(tex1, texCoord).r * specular * inten) * fixlight;
+	return (texture(diffuse0, texCoord) * (diffuse * inten + ambient) + texture(specular0, texCoord).r * specular * inten) * fixlight;
 }
 
 vec4 pointLight()
@@ -69,7 +70,7 @@ vec4 pointLight()
 	float specAmount = pow(max(dot(viewDirection, reflectionDirection), 0.0f), 16);
 	float specular = specAmount * specularLight;
 	vec4 fixlight = vec4(lightColor.x,lightColor.y,lightColor.z,1.0f);
-	return (texture(tex0, texCoord) * (diffuse * inten + ambient) + texture(tex1, texCoord).r * specular * inten) * fixlight;
+	return (texture(diffuse0, texCoord) * (diffuse * inten + ambient) + texture(specular0, texCoord).r * specular * inten) * fixlight;
 }
 
 void main()
