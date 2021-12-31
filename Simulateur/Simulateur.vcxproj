@@ -161,6 +161,7 @@
     <ClCompile Include="MenuConnexion.cpp" />
     <ClCompile Include="menuVoiture.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="raycast.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="shaderClass.cpp" />
     <ClCompile Include="Simulateur.cpp" />
@@ -173,6 +174,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EBO.h" />
+    <ClInclude Include="raycast.h" />
     <ClInclude Include="libs\imguilib\imconfig.h" />
     <ClInclude Include="libs\imguilib\imgui.h" />
     <ClInclude Include="libs\imguilib\imgui_impl_glfw.h" />
@@ -183,7 +185,6 @@
     <ClInclude Include="Line.h" />
     <ClInclude Include="MenuConnexion.h" />
     <ClInclude Include="menuVoiture.h" />
-    <ClInclude Include="Mesh.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="shaderClass.h" />
