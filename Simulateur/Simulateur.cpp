@@ -1,6 +1,7 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <stb/stb_image.h>
 
 #include "shaderClass.h"
 #include "VAO.h"
@@ -13,40 +14,13 @@
 #include "MenuConnexion.h"
 #include "menuVoiture.h"
 #include "Line.h"
-#include "glm/vec2.hpp"
-
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-	glViewport(0, 0, width, height);
-}
-void window_size_callback(GLFWwindow* window, int width, int height)
-{
-	if (height < 100)
-		height = 100;
-	glfwSetWindowSize(window,width, (int)(width/1.25f));
-	glViewport(0, 0, width, (int)(width / 1.25f));
-}
-
-void HideConsole()
-{
-	::ShowWindow(::GetConsoleWindow(), SW_HIDE);
-}
-
-void ShowConsole()
-{
-	::ShowWindow(::GetConsoleWindow(), SW_SHOW);
-}
-
-bool IsConsoleVisible()
-{
-	return ::IsWindowVisible(::GetConsoleWindow()) != FALSE;
-}
-
-void processInput(GLFWwindow* window)
-{
-	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, true);
-}
+#include <glm/gtx/string_cast.hpp>
+#include <glm/vec2.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include "Texture.h"
+#include "Camera.h"
+#include "windowUtils.h"
 
 void tournerVecteur(glm::vec2 *v, float angle) {
 	float x2 = v->x * cos(angle) - v->y * sin(angle);
@@ -79,29 +53,83 @@ glm::vec2 rayCast(glm::vec2 wp1,glm::vec2 wp2,glm::vec2 rayStart,glm::vec2 rayDi
 		return glm::vec2(-2.f, -2.f);
 	}
 }
-// Vertices coordinates
-GLfloat vertices[] =
+glm::vec3 triIntersect(glm::vec3 ro,glm::vec3 rd,glm::vec3 v0,glm::vec3 v1,glm::vec3 v2)
 {
-	-0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower left corner
-	0.5f, -0.5f * float(sqrt(3)) / 3, 0.0f, // Lower right corner
-	0.0f, 0.5f * float(sqrt(3)) * 2 / 3, 0.0f, // Upper corner
-	-0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner left
-	0.5f / 2, 0.5f * float(sqrt(3)) / 6, 0.0f, // Inner right
-	0.0f, -0.5f * float(sqrt(3)) / 3, 0.0f // Inner down
+	glm::vec3 v1v0 = v1 - v0;
+	glm::vec3 v2v0 = v2 - v0;
+	glm::vec3 rov0 = ro - v0;
+	glm::vec3  n = glm::cross(v1v0, v2v0); // cross produit vectoriel
+	glm::vec3  q = glm::cross(rov0, rd);
+	float d = 1.0f / dot(rd, n); // dot produit scalaire
+	float u = d * dot(-q, v2v0);
+	float v = d * dot(q, v1v0);
+	float t = d * dot(-n, rov0);
+	if (u < 0.0f || u>1.0f || v < 0.0f || (u + v)>1.0f)
+		t = -1.0f;
+	return glm::vec3(t, u, v);
+}
+
+GLfloat vertices[] =
+{ //     COORDINATES     /        COLORS      /   TexCoord  //
+	-0.5f, -0.5f, 0.0f,     1.0f, 0.0f, 0.0f,	0.0f, 0.0f, // Lower left corner
+	-0.5f,  0.5f, 0.0f,     0.0f, 1.0f, 0.0f,	0.0f, 1.0f, // Upper left corner
+	 0.5f,  0.5f, 0.0f,     0.0f, 0.0f, 1.0f,	1.0f, 1.0f, // Upper right corner
+	 0.5f, -0.5f, 0.0f,     1.0f, 1.0f, 1.0f,	1.0f, 0.0f  // Lower right corner
 };
-// Indices for vertices order
+
 GLuint indices[] =
 {
-	0, 3, 5, // Lower left triangle
-	3, 2, 4, // Lower right triangle
-	5, 4, 1, // Upper triangle
+	0, 2, 1, 
+	0, 3, 2 
+};
+
+GLfloat verticesPyramide[] =
+{ //     COORDINATES     /        COLORS        /    TexCoord    /       NORMALS     //
+	-1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 0.0f,		0.0f, 1.0f, 0.0f,
+	-1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		0.0f, 1.0f,		0.0f, 1.0f, 0.0f,
+	 1.0f, 0.0f, -1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 1.0f,		0.0f, 1.0f, 0.0f,
+	 1.0f, 0.0f,  1.0f,		0.0f, 0.0f, 0.0f,		1.0f, 0.0f,		0.0f, 1.0f, 0.0f
+};
+GLuint indicesPyramide[] =
+{
+	0, 1, 2,
+	0, 2, 3
+};
+
+GLfloat lightVertices[] =
+{ //     COORDINATES     //
+	-0.1f, -0.1f,  0.1f,
+	-0.1f, -0.1f, -0.1f,
+	 0.1f, -0.1f, -0.1f,
+	 0.1f, -0.1f,  0.1f,
+	-0.1f,  0.1f,  0.1f,
+	-0.1f,  0.1f, -0.1f,
+	 0.1f,  0.1f, -0.1f,
+	 0.1f,  0.1f,  0.1f
+};
+
+GLuint lightIndices[] =
+{
+	0, 1, 2,
+	0, 2, 3,
+	0, 4, 7,
+	0, 7, 3,
+	3, 7, 6,
+	3, 6, 2,
+	2, 6, 5,
+	2, 5, 1,
+	1, 5, 4,
+	1, 4, 0,
+	4, 5, 6,
+	4, 6, 7
 };
 
 GLuint linesIndices[] =
 {
 	0,1,2,3,4,5
 };
-
+const unsigned int width = 800;
+const unsigned int height = 800;
 
 int main()
 {
@@ -124,18 +152,13 @@ int main()
 	// Initialize GLFW
 	glfwInit();
 
-	// Tell GLFW what version of OpenGL we are using 
-	// In this case we are using OpenGL 3.3
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 
-	// Tell GLFW we are using the CORE profile
-	// So that means we only have the modern functions
+
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
-	// Create a GLFWwindow object of 800 by 800 pixels, naming it "YoutubeOpenGL"
-	GLFWwindow* window = glfwCreateWindow(800, 800, "Simulateur Auto-mobile", NULL, NULL);
-	// Error check if the window fails to create
+	//glfwWindowHint(GLFW_TRANSPARENT_FRAMEBUFFER, 1);
+	GLFWwindow* window = glfwCreateWindow(width, height, "Simulateur Auto-mobile", NULL, NULL);
 	if (window == NULL)
 	{
 		std::cout << "Failed to create GLFW window" << std::endl;
@@ -144,12 +167,11 @@ int main()
 	}
 	
 
-	// Introduce the window into the current context
 	glfwMakeContextCurrent(window);
 
 	glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 	glfwSetWindowSizeCallback(window, window_size_callback);
-
+	const int taux_rafraichissement = glfwGetVideoMode(glfwGetPrimaryMonitor())->refreshRate;
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 
@@ -165,13 +187,10 @@ int main()
 
 	//Load GLAD so it configures OpenGL
 	gladLoadGL();
-	// Specify the viewport of OpenGL in the Window
-	// In this case the viewport goes from x = 0, y = 0, to x = 800, y = 800
-	glViewport(0, 0, 800, 800);
+	glViewport(0, 0, width, height);
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-	// Generates Shader object using shaders defualt.vert and default.frag
 	Shader shaderProgram("default.vert", "default.frag");
 	Shader shaderLigne("ligne.vert","ligne.frag");
 
@@ -185,16 +204,74 @@ int main()
 	EBO EBO1(indices, sizeof(indices));
 
 	// Links VBO to VAO
-	VAO1.LinkVBO(VBO1, 0);
-	// Unbind all to prevent accidentally modifying them
+	VAO1.LinkAttrib(VBO1, 0, 3, GL_FLOAT, 8 * sizeof(float), (void*)0);
+	VAO1.LinkAttrib(VBO1, 1, 3, GL_FLOAT, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAO1.LinkAttrib(VBO1, 2, 2, GL_FLOAT, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+	// Unbind pour éviter de les modifier
 	VAO1.Unbind();
 	VBO1.Unbind();
 	EBO1.Unbind();
 
+	Texture voit("voiture.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
+	voit.texUnit(shaderProgram, "tex0", 0);
+	voit.texUnit(shaderProgram, "tex1", 1);
+
+	VAO VAOp;
+	VAOp.Bind();
+
+	VBO VBOp(verticesPyramide, sizeof(verticesPyramide));
+	EBO EBOp(indicesPyramide, sizeof(indicesPyramide));
+
+	VAOp.LinkAttrib(VBOp, 0, 3, GL_FLOAT, 11 * sizeof(float), (void*)0);
+	VAOp.LinkAttrib(VBOp, 1, 3, GL_FLOAT, 11 * sizeof(float), (void*)(3 * sizeof(float)));
+	VAOp.LinkAttrib(VBOp, 2, 2, GL_FLOAT, 11 * sizeof(float), (void*)(6 * sizeof(float)));
+	VAOp.LinkAttrib(VBO1, 3, 3, GL_FLOAT, 11 * sizeof(float), (void*)(8 * sizeof(float)));
+
+	VAOp.Unbind();
+	VBOp.Unbind();
+	EBOp.Unbind();
+
+	Texture planTex("planks.png", GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE);
+	planTex.texUnit(shaderProgram, "tex0", 0);
+	Texture planSpec("planksSpec.png", GL_TEXTURE_2D, 1, GL_RED, GL_UNSIGNED_BYTE);
+	planSpec.texUnit(shaderProgram, "tex1", 1);
+
+	// Shader pour la spotlight cube
+	Shader lightShader("light.vert", "light.frag");
+	VAO lightVAO;
+	lightVAO.Bind();
+	VBO lightVBO(lightVertices, sizeof(lightVertices));
+	EBO lightEBO(lightIndices, sizeof(lightIndices));
+	lightVAO.LinkAttrib(lightVBO, 0, 3, GL_FLOAT, 3 * sizeof(float), (void*)0);
+	lightVAO.Unbind();
+	lightVBO.Unbind();
+	lightEBO.Unbind();
+
+
+
+	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::mat4 lightModel = glm::mat4(1.0f);
+	lightModel = glm::translate(lightModel, lightPos);
+
+	glm::vec3 pyramidPos = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::mat4 pyramidModel = glm::mat4(1.0f);
+	pyramidModel = glm::translate(pyramidModel, pyramidPos);
+
+
+	lightShader.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
+	glUniform3f(glGetUniformLocation(lightShader.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+	shaderProgram.Activate();
+	glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(pyramidModel));
+	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightColor"), lightColor.x, lightColor.y, lightColor.z);
+	glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightPos.x, lightPos.y, lightPos.z);
+
+
 	VAO VAO2;
 	VAO2.Bind();
 	VBO VBO2(&Line::listeLignes.data()[0], Line::listeLignes.size()*sizeof(GLfloat));
-	EBO EBO2(&Line::listeIndices.data()[0], Line::number * 2 * sizeof(GLuint));
+	EBO EBO2(&Line::listeIndices.data()[0], ((unsigned long long) Line::number) * 2 * sizeof(GLuint));
 	
 	VAO2.LinkVBO(VBO2, 0);
 	VAO2.Unbind();
@@ -204,13 +281,14 @@ int main()
 
 
 	//gestion du temps
-	const double updateInterval = 1.0 / 60.0;
+	const double updateInterval = 1.0 / taux_rafraichissement;
 	double lastTime = 0.0;
 	bool show_demo_window = true;
-	// Main while loop
+
 	static float f = 0.0f;
 	bool showProfiler = false;
 	bool show_MenuConnexion = false;
+	bool show_MenuSimulation = true;
 
 	//io.Fonts->AddFontDefault();
 	ImFontConfig config;
@@ -219,25 +297,53 @@ int main()
 	config.GlyphExtraSpacing.x = 1.0f;
 	io.Fonts->AddFontFromFileTTF("Roboto-Regular.ttf", 18.0f,&config); 
 
+	float rotation = 0.0f;
+
+	glEnable(GL_DEPTH_TEST);
+	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
 
 	while (!glfwWindowShouldClose(window))
 	{
 		processInput(window);
+		//ImGui::IsMouseHoveringRect(ImVec2(0, 0), ImVec2(ImGui::GetIO().DisplaySize.x, 24));
+
 		double time = glfwGetTime();
 		double deltaTime = time - lastTime;
 		if (deltaTime < updateInterval) {
 			continue;
 		}
-		lastTime = time;
+		rotation += (float) 1.f * deltaTime;
+		lightModel = glm::rotate(lightModel, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		lightModel = glm::translate(lightModel, glm::vec3(0, 0.1*deltaTime, 0.0f));
+		lightShader.Activate();
+		glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
 
-		
-		// Tell OpenGL which Shader Program we want to use
+		lastTime = time;
+		camera.Inputs(window);
+		camera.updateMatrix(45.0f, 0.1f, 100.0f);
 		shaderProgram.Activate();
-		// Bind the VAO so OpenGL knows to use it
+		glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightModel[3].x, lightModel[3].y, lightModel[3].z);
+		glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
+		camera.Matrix(shaderProgram, "camMatrix");
+
+		planTex.Bind();
+		planSpec.Bind();
+		VAOp.Bind();
+		glDrawElements(GL_TRIANGLES, sizeof(indicesPyramide)/sizeof(int), GL_UNSIGNED_INT, 0);
+		lightShader.Activate();
+		// Exporte la  matrice de camera vers le vertex shader de la lumiere
+		camera.Matrix(lightShader, "camMatrix");
+		lightVAO.Bind();
+		glDrawElements(GL_TRIANGLES, sizeof(lightIndices) / sizeof(int), GL_UNSIGNED_INT, 0);
+		planTex.Unbind();
+		planSpec.Unbind();
+		shaderProgram.Activate();
+		voit.Bind();
 		VAO1.Bind();
-		// Draw primitives, number of indices, datatype of indices, index of indices
-		shaderProgram.Activate();
-		glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_INT, 0);
+
+		glDrawElements(GL_TRIANGLES, sizeof(indices)/sizeof(int), GL_UNSIGNED_INT, 0);
+		
+		
 		//VAO1.Unbind();
 		VAO2.Bind();
 		shaderLigne.Activate();
@@ -264,9 +370,15 @@ int main()
 				ImGui::EndMenu();
 			}
 			if (ImGui::BeginMenu("Options")) {
-				if (ImGui::MenuItem("showProfiler")) {
+				if (ImGui::MenuItem("Profiler")) {
 					showProfiler = !showProfiler;
 					std::cout << "Menu connexion " << showProfiler << std::endl;
+				}
+				if (ImGui::MenuItem("Console")) {
+					if (IsConsoleVisible())
+						HideConsole();
+					else
+						ShowConsole();
 				}
 				ImGui::EndMenu();
 			}
@@ -306,7 +418,7 @@ int main()
 			glfwGetWindowSize(window, &width, &height);
 			ImGui::SetNextWindowPos(glm::vec2(50, 300), ImGuiCond_FirstUseEver);*/
 			handleMenuConnexion(&show_MenuConnexion);
-			handleMenuVoiture(&show_MenuConnexion);
+			handleMenuVoiture(&show_MenuSimulation);
 			
 		}
 		
@@ -320,16 +432,14 @@ int main()
 		// Specify the color of the background
 		glClearColor(((float*)&clear_color)[0], ((float*)&clear_color)[1], ((float*)&clear_color)[2], 1.0f);
 		// Clean the back buffer and assign the new color to it
-		glClear(GL_COLOR_BUFFER_BIT);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	}
 
-
-
-	// Delete all the objects we've created
 	VAO1.Delete();
 	VBO1.Delete();
 	EBO1.Delete();
 	shaderProgram.Delete();
+	voit.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program

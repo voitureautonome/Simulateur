@@ -80,8 +80,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\lib\glfw\include\;C:\lib\YDLidar\src;C:\lib\imguilib;D:\lib\glfw\include\;D:\lib\YDLidar\src;D:\lib\imguilib;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\lib\glfw\build\src\Debug;C:\lib\YDLidar\src;D:\lib\glfw\build\src\Debug;D:\lib\YDLidar\src;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(ProjectDir)libs\include;$(ProjectDir)libs\imguilib;$(ProjectDir)libs\glfw\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(ProjectDir)libs\glfw\build\src\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -121,12 +121,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\lib\imguilib;D:\lib\imguilib</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\lib\imguilib;$(ProjectDir)\libs\imguilib</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3dll.lib;ydlidar_sdk.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -146,69 +146,55 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_demo.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_draw.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_tables.cpp" />
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_widgets.cpp" />
+    <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EBO.cpp" />
     <ClCompile Include="glad.c" />
+    <ClCompile Include="libs\imguilib\imgui.cpp" />
+    <ClCompile Include="libs\imguilib\imgui_demo.cpp" />
+    <ClCompile Include="libs\imguilib\imgui_draw.cpp" />
+    <ClCompile Include="libs\imguilib\imgui_impl_glfw.cpp" />
+    <ClCompile Include="libs\imguilib\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="libs\imguilib\imgui_tables.cpp" />
+    <ClCompile Include="libs\imguilib\imgui_widgets.cpp" />
     <ClCompile Include="Line.cpp" />
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="MenuConnexion.cpp" />
     <ClCompile Include="menuVoiture.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="shaderClass.cpp" />
     <ClCompile Include="Simulateur.cpp" />
+    <ClCompile Include="stb.cpp" />
+    <ClCompile Include="Texture.cpp" />
     <ClCompile Include="VAO.cpp" />
     <ClCompile Include="VBO.cpp" />
+    <ClCompile Include="windowUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imconfig.h" />
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imgui.h" />
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imgui_impl_glfw.h" />
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imgui_impl_opengl3.h" />
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imgui_internal.h" />
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imstb_rectpack.h" />
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imstb_textedit.h" />
+    <ClInclude Include="Camera.h" />
     <ClInclude Include="EBO.h" />
-    <ClInclude Include="glm\common.hpp" />
-    <ClInclude Include="glm\exponential.hpp" />
-    <ClInclude Include="glm\ext.hpp" />
-    <ClInclude Include="glm\fwd.hpp" />
-    <ClInclude Include="glm\geometric.hpp" />
-    <ClInclude Include="glm\glm.hpp" />
-    <ClInclude Include="glm\integer.hpp" />
-    <ClInclude Include="glm\mat2x2.hpp" />
-    <ClInclude Include="glm\mat2x3.hpp" />
-    <ClInclude Include="glm\mat2x4.hpp" />
-    <ClInclude Include="glm\mat3x2.hpp" />
-    <ClInclude Include="glm\mat3x3.hpp" />
-    <ClInclude Include="glm\mat3x4.hpp" />
-    <ClInclude Include="glm\mat4x2.hpp" />
-    <ClInclude Include="glm\mat4x3.hpp" />
-    <ClInclude Include="glm\mat4x4.hpp" />
-    <ClInclude Include="glm\matrix.hpp" />
-    <ClInclude Include="glm\packing.hpp" />
-    <ClInclude Include="glm\trigonometric.hpp" />
-    <ClInclude Include="glm\vec2.hpp" />
-    <ClInclude Include="glm\vec3.hpp" />
-    <ClInclude Include="glm\vec4.hpp" />
-    <ClInclude Include="glm\vector_relational.hpp" />
+    <ClInclude Include="libs\imguilib\imconfig.h" />
+    <ClInclude Include="libs\imguilib\imgui.h" />
+    <ClInclude Include="libs\imguilib\imgui_impl_glfw.h" />
+    <ClInclude Include="libs\imguilib\imgui_impl_opengl3.h" />
+    <ClInclude Include="libs\imguilib\imgui_internal.h" />
+    <ClInclude Include="libs\imguilib\imstb_rectpack.h" />
+    <ClInclude Include="libs\imguilib\imstb_textedit.h" />
     <ClInclude Include="Line.h" />
     <ClInclude Include="MenuConnexion.h" />
     <ClInclude Include="menuVoiture.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="shaderClass.h" />
+    <ClInclude Include="Simulateur.h" />
+    <ClInclude Include="Texture.h" />
     <ClInclude Include="VAO.h" />
     <ClInclude Include="VBO.h" />
+    <ClInclude Include="windowUtils.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="default.frag" />
     <None Include="default.vert" />
+    <None Include="light.frag" />
+    <None Include="light.vert" />
     <None Include="ligne.frag" />
     <None Include="ligne.vert" />
     <None Include="SimpleFragmentShader.fragmentshader" />
@@ -221,7 +207,11 @@
     <Font Include="..\x64\Debug\Roboto-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="glm\CMakeLists.txt" />
+    <Image Include="brick.png" />
+    <Image Include="logo.ico" />
+    <Image Include="planks.png" />
+    <Image Include="planksSpec.png" />
+    <Image Include="voiture.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

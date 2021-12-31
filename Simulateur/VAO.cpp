@@ -1,6 +1,6 @@
 #include"VAO.h"
 
-// Constructor that generates a VAO ID
+// constructeur generant un ID pour le VAO
 VAO::VAO()
 {
 	glGenVertexArrays(1, &ID);
@@ -15,19 +15,27 @@ void VAO::LinkVBO(VBO& VBO, GLuint layout)
 	VBO.Unbind();
 }
 
-// Binds the VAO
+void VAO::LinkAttrib(VBO& VBO, GLuint layout, GLuint numComponents, GLenum type, GLsizeiptr stride, void* offset)
+{
+	VBO.Bind();
+	glVertexAttribPointer(layout, numComponents, type, GL_FALSE, stride, offset);
+	glEnableVertexAttribArray(layout);
+	VBO.Unbind();
+}
+
+// Bind le VAO , dit a opengl que c'est cette objet qu'on utilise au prochain drawcall
 void VAO::Bind()
 {
 	glBindVertexArray(ID);
 }
 
-// Unbinds the VAO
+// pour unbind on dit a opengl d'utiliser l'element 0 qui sert d'element null
 void VAO::Unbind()
 {
 	glBindVertexArray(0);
 }
 
-// Deletes the VAO
+// supprime d'openGL nos données concernant ce VAO et libere automatiquement la memoire
 void VAO::Delete()
 {
 	glDeleteVertexArrays(1, &ID);

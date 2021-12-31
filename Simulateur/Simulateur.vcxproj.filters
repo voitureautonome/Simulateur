@@ -16,17 +16,17 @@
     <Filter Include="Fichiers de ressources\shaders">
       <UniqueIdentifier>{cd1f3bef-62c9-4d1e-a67c-55538ab1a9d1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers sources\imgui">
-      <UniqueIdentifier>{6799569a-41c3-421e-9c3d-0e0bb6154115}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Fichiers d%27en-tête\imgui">
-      <UniqueIdentifier>{b4a41839-0bc5-4d8f-9f3f-cc09c9a2684d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Fichiers de ressources\fonts">
       <UniqueIdentifier>{29365d68-4cbb-4b14-bf54-f0dbcf340158}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Fichiers d%27en-tête\glm">
-      <UniqueIdentifier>{9c0e91ee-2161-4be6-8ab0-b16d787e2bd4}</UniqueIdentifier>
+    <Filter Include="Fichiers de ressources\Textures">
+      <UniqueIdentifier>{951de530-c924-472f-bd22-2c8f7bfa85b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers d%27en-tête\imgui">
+      <UniqueIdentifier>{2f859b19-169a-4296-9d3f-ce49e164a7c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Fichiers sources\imgui">
+      <UniqueIdentifier>{ee087225-39fc-4a34-83d6-f7d76431e127}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -51,30 +51,6 @@
     <ClCompile Include="VBO.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
-    <ClCompile Include="Main.cpp">
-      <Filter>Fichiers sources</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_tables.cpp">
-      <Filter>Fichiers sources\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_widgets.cpp">
-      <Filter>Fichiers sources\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui.cpp">
-      <Filter>Fichiers sources\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_demo.cpp">
-      <Filter>Fichiers sources\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_draw.cpp">
-      <Filter>Fichiers sources\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_impl_glfw.cpp">
-      <Filter>Fichiers sources\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\..\..\lib\imguilib\imgui_impl_opengl3.cpp">
-      <Filter>Fichiers sources\imgui</Filter>
-    </ClCompile>
     <ClCompile Include="MenuConnexion.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
@@ -83,6 +59,39 @@
     </ClCompile>
     <ClCompile Include="Line.cpp">
       <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="stb.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="windowUtils.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imguilib\imgui_draw.cpp">
+      <Filter>Fichiers sources\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imguilib\imgui_impl_glfw.cpp">
+      <Filter>Fichiers sources\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imguilib\imgui_impl_opengl3.cpp">
+      <Filter>Fichiers sources\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imguilib\imgui_tables.cpp">
+      <Filter>Fichiers sources\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imguilib\imgui_widgets.cpp">
+      <Filter>Fichiers sources\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imguilib\imgui.cpp">
+      <Filter>Fichiers sources\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="libs\imguilib\imgui_demo.cpp">
+      <Filter>Fichiers sources\imgui</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -104,27 +113,6 @@
     <ClInclude Include="resource.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imgui_internal.h">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imstb_rectpack.h">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imstb_textedit.h">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imconfig.h">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imgui.h">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imgui_impl_glfw.h">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\..\..\lib\imguilib\imgui_impl_opengl3.h">
-      <Filter>Fichiers d%27en-tête\imgui</Filter>
-    </ClInclude>
     <ClInclude Include="MenuConnexion.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -134,74 +122,38 @@
     <ClInclude Include="Line.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="glm\common.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="Texture.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="glm\exponential.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="Simulateur.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="glm\ext.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="Camera.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="glm\fwd.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="windowUtils.h">
+      <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
-    <ClInclude Include="glm\geometric.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="libs\imguilib\imgui.h">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="glm\glm.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="libs\imguilib\imgui_impl_glfw.h">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="glm\integer.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="libs\imguilib\imgui_impl_opengl3.h">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="glm\mat2x2.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="libs\imguilib\imgui_internal.h">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="glm\mat2x3.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="libs\imguilib\imstb_rectpack.h">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="glm\mat2x4.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="libs\imguilib\imstb_textedit.h">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="glm\mat3x2.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\mat3x3.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\mat3x4.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\mat4x2.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\mat4x3.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\mat4x4.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\matrix.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\packing.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\trigonometric.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\vec2.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\vec3.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\vec4.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </ClInclude>
-    <ClInclude Include="glm\vector_relational.hpp">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
+    <ClInclude Include="libs\imguilib\imconfig.h">
+      <Filter>Fichiers d%27en-tête\imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -223,6 +175,12 @@
     <None Include="ligne.vert">
       <Filter>Fichiers de ressources\shaders</Filter>
     </None>
+    <None Include="light.frag">
+      <Filter>Fichiers de ressources\shaders</Filter>
+    </None>
+    <None Include="light.vert">
+      <Filter>Fichiers de ressources\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Simulateur.rc">
@@ -235,8 +193,20 @@
     </Font>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="glm\CMakeLists.txt">
-      <Filter>Fichiers d%27en-tête\glm</Filter>
-    </Text>
+    <Image Include="voiture.png">
+      <Filter>Fichiers de ressources\Textures</Filter>
+    </Image>
+    <Image Include="brick.png">
+      <Filter>Fichiers de ressources\Textures</Filter>
+    </Image>
+    <Image Include="logo.ico">
+      <Filter>Fichiers de ressources</Filter>
+    </Image>
+    <Image Include="planksSpec.png">
+      <Filter>Fichiers de ressources\Textures</Filter>
+    </Image>
+    <Image Include="planks.png">
+      <Filter>Fichiers de ressources\Textures</Filter>
+    </Image>
   </ItemGroup>
 </Project>
