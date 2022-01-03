@@ -213,6 +213,7 @@
   <ItemGroup>
     <Image Include="brick.png" />
     <Image Include="logo.ico" />
+    <Image Include="logo.png" />
     <Image Include="planks.png" />
     <Image Include="planksSpec.png" />
     <Image Include="voiture.png" />

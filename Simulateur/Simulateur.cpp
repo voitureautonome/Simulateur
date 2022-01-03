@@ -157,6 +157,10 @@ int main()
 		return -1;
 	}
 	
+	GLFWimage images[1];
+	images[0].pixels = stbi_load("charly.png", &images[0].width, &images[0].height, 0, 4); //rgba channels 
+	glfwSetWindowIcon(window, 1, images);
+	stbi_image_free(images[0].pixels);
 
 	glfwMakeContextCurrent(window);
 
@@ -197,11 +201,10 @@ int main()
 	Shader lightShader("light.vert", "light.frag");
 	std::vector <Vertex> lightVerts(lightVertices, lightVertices + sizeof(lightVertices) / sizeof(Vertex));
 	std::vector <GLuint> lightInd(lightIndices, lightIndices + sizeof(lightIndices) / sizeof(GLuint));
-	// Crate light mesh
 	Mesh light(lightVerts, lightInd, tex);
 
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-	glm::vec3 lightPos = glm::vec3(0.5f, 0.5f, 0.5f);
+	glm::vec3 lightPos = glm::vec3(0.5f, 1.5f, 0.5f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
 
@@ -265,8 +268,8 @@ int main()
 		}
 		lastTime = time;
 		rotation += (float) 1.f * deltaTime;
-		lightModel = glm::rotate(lightModel, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
-		lightModel = glm::translate(lightModel, glm::vec3(0, 0.1*deltaTime, 0.0f));
+		//lightModel = glm::rotate(lightModel, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
+		//lightModel = glm::translate(lightModel, glm::vec3(0, 0.1*deltaTime, 0.0f));
 		lightShader.Activate();
 		glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
 
@@ -317,6 +320,7 @@ int main()
 				}
 				ImGui::EndMenu();
 			}
+			ImGui::Text("FPS %.1f",ImGui::GetIO().Framerate);
 			ImGui::EndMainMenuBar();
 		}
 

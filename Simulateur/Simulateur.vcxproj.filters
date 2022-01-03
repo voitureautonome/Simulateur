@@ -164,9 +164,6 @@
     <ClInclude Include="libs\imguilib\imconfig.h">
       <Filter>Fichiers d%27en-tête\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="Mesh.h">
-      <Filter>Fichiers d%27en-tête</Filter>
-    </ClInclude>
     <ClInclude Include="raycast.h">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
@@ -222,6 +219,9 @@
     </Image>
     <Image Include="planks.png">
       <Filter>Fichiers de ressources\Textures</Filter>
+    </Image>
+    <Image Include="logo.png">
+      <Filter>Fichiers de ressources</Filter>
     </Image>
   </ItemGroup>
 </Project>

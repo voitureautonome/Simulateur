@@ -73,7 +73,9 @@ void Shader::Delete()
 
 void Shader::erreurCompilation(unsigned int shader, const char* type) {
 	GLint hasCompiled=0;
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &hasCompiled);
 	char infoLog[1024];
+	if (hasCompiled == GL_TRUE) return;
 	if (type != "PROGAM") {
 		glGetShaderInfoLog(shader, 1024, NULL, infoLog);
 		std::cout << "ERREUR COMPILATION SHADER : " << type << std::endl;
