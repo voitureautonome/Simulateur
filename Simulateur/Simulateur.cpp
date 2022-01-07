@@ -26,6 +26,7 @@
 #include "windowUtils.h"
 #include "Mesh.h"
 #include "Model.h"
+#include "raycast.h"
 void tournerVecteur(glm::vec2 *v, float angle) {
 	float x2 = v->x * cos(angle) - v->y * sin(angle);
 	float y2 = v->x * sin(angle) + v->y * cos(angle);
