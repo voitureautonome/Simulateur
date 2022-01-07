@@ -161,6 +161,7 @@
     <ClCompile Include="MenuConnexion.cpp" />
     <ClCompile Include="menuVoiture.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Model.cpp" />
     <ClCompile Include="raycast.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="shaderClass.cpp" />
@@ -174,6 +175,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EBO.h" />
+    <ClInclude Include="Model.h" />
     <ClInclude Include="raycast.h" />
     <ClInclude Include="libs\imguilib\imconfig.h" />
     <ClInclude Include="libs\imguilib\imgui.h" />

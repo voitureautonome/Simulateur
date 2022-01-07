@@ -13,14 +13,14 @@ std::string get_file_contents(const char* filename);
 class Shader
 {
 public:
-	// Reference ID of the Shader Program
+	// ID de reference du shader program
 	GLuint ID;
-	// Constructor that build the Shader Program from 2 different shaders
+	//compile le vertex et fragment shader
 	Shader(const char* vertexFile, const char* fragmentFile);
 
-	// Activates the Shader Program
+	// active le shader Program
 	void Activate();
-	// Deletes the Shader Program
+	// supprime le shader program
 	void Delete();
 	void erreurCompilation(unsigned int shader, const char* type);
 };

@@ -17,19 +17,20 @@ struct Vertex
 class VBO
 {
 public:
-	// Reference ID of the Vertex Buffer Object
+	//ID reference de l'objet
 	GLuint ID;
 	std::vector<GLfloat>* vector;
-	// Constructor that generates a Vertex Buffer Object and links it to vertices
+	
+	//Cnstruit un VBO et le relie a ses sommets
 	VBO(GLfloat* vertices, GLsizeiptr size);
 	VBO(std::vector<GLfloat>* _vector, GLsizeiptr size);
 	VBO(std::vector<Vertex>& vertices);
 
-	// Binds the VBO
+	// Bind le VBO
 	void Bind();
-	// Unbinds the VBO
+	// Unbind le VBO
 	void Unbind();
-	// Deletes the VBO
+	// Supprime le VBO
 	void Delete();
 };
 

@@ -4,51 +4,90 @@ Texture::Texture(const char* image, const char* texType, GLuint slot, GLenum for
 {
 	type = texType;
 
-	// Stores the width, height, and the number of color channels of the image
 	int widthImg, heightImg, numColCh;
-	// Flips the image so it appears right side up
-	stbi_set_flip_vertically_on_load(true);
+	stbi_set_flip_vertically_on_load(true); //fichier image de gauche a droite et de bas en haut contrairement a openGL on doit donc inverser
 	// Reads the image from a file and stores it in bytes
+	//recupere l'image dans un  tableau de bytes , pointeur
 	unsigned char* bytes = stbi_load(image, &widthImg, &heightImg, &numColCh, 0);
 
-	// Generates an OpenGL texture object
+	//genere un objet texture OpenGL et nous donne son ID dans la variable ID pour pouvoir s'en servir
 	glGenTextures(1, &ID);
-	// Assigns the texture to a Texture Unit
+	//assigne la texture a une texture unit
 	glActiveTexture(GL_TEXTURE0 + slot);
 	unit = slot;
 	glBindTexture(GL_TEXTURE_2D, ID);
 
 	// Configures the type of algorithm that is used to make the image smaller or bigger
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	//algo pour rééchantillonner l'image en fonction des dimensions et de la deformation
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	// Configures the way the texture repeats (if it does at all)
+	// reglage du mode de repetition de la texture ou des bordures
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
-	// Extra lines in case you choose to use GL_CLAMP_TO_BORDER
-	// float flatColor[] = {1.0f, 1.0f, 1.0f, 1.0f};
-	// glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, flatColor);
 
-	// Assigns the image to the OpenGL Texture object
+	//assigne l'image à l'objet opengl , cela met l'image dans la memoire de la carte graphique
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthImg, heightImg, 0, format, pixelType, bytes);
-	// Generates MipMaps
+	// genere des mip map , des versions plus petites des textures pour accelerer le rendu et ne pas le faire dans notre boucle
 	glGenerateMipmap(GL_TEXTURE_2D);
 
-	// Deletes the image data as it is already in the OpenGL Texture object
+	//libere la memoire que prend l'image  dans la memoire du CPU
 	stbi_image_free(bytes);
 
-	// Unbinds the OpenGL Texture object so that it can't accidentally be modified
+
+	//unbind l'objet OPENGL pour éviter de le modifier 
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+Texture::Texture(const char* image, const char* texType, GLuint slot)
+{
+	type = texType;
+	int widthImg, heightImg, numColCh;
+	stbi_set_flip_vertically_on_load(true);
+	unsigned char* bytes = stbi_load(image, &widthImg, &heightImg, &numColCh, 0);
+
+	glGenTextures(1, &ID);
+	glActiveTexture(GL_TEXTURE0 + slot);
+	unit = slot;
+	glBindTexture(GL_TEXTURE_2D, ID);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+
+	switch (numColCh)
+	{
+	case 4:
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, widthImg, heightImg, 0, GL_RGBA, GL_UNSIGNED_BYTE, bytes); // 4 canaux donc RGBA ( transparence) 
+		break;
+	case 3:
+		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,widthImg,heightImg,0,GL_RGB,GL_UNSIGNED_BYTE,bytes); //3 canaux donc RGB
+		break;
+	case 1:
+		glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA,widthImg,heightImg,0,GL_RED,GL_UNSIGNED_BYTE,bytes); // 1 canal channel RED
+		break;
+	default:
+		throw std::invalid_argument("Types de couleurs non implémentées");
+		break;
+	}	
+
+	glGenerateMipmap(GL_TEXTURE_2D);
+
+	stbi_image_free(bytes);
+
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void Texture::texUnit(Shader& shader, const char* uniform, GLuint unit)
 {
-	// Gets the location of the uniform
+	// recupere l'emplacement de l'uniform , c'est une variable global de shader
 	GLuint texUni = glGetUniformLocation(shader.ID, uniform);
-	// Shader needs to be activated before changing the value of a uniform
+	//le shader doit etre actif pour pouvoir modifier une de ses valeurs
 	shader.Activate();
-	// Sets the value of the uniform
+	// change la valeur de l'uniform
 	glUniform1i(texUni, unit);
 }
 

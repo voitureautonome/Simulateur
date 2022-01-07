@@ -25,6 +25,7 @@
 #include "Camera.h"
 #include "windowUtils.h"
 #include "Mesh.h"
+#include "Model.h"
 void tournerVecteur(glm::vec2 *v, float angle) {
 	float x2 = v->x * cos(angle) - v->y * sin(angle);
 	float y2 = v->x * sin(angle) + v->y * cos(angle);
@@ -186,8 +187,8 @@ int main()
 
 	Texture textures[]
 	{
-		Texture("planks.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
-		Texture("planksSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
+		Texture("solIUT.png", "diffuse", 0, GL_RGBA, GL_UNSIGNED_BYTE),
+		Texture("solIUTSpec.png", "specular", 1, GL_RED, GL_UNSIGNED_BYTE)
 	};
 
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -204,7 +205,7 @@ int main()
 	Mesh light(lightVerts, lightInd, tex);
 
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-	glm::vec3 lightPos = glm::vec3(0.5f, 1.5f, 0.5f);
+	glm::vec3 lightPos = glm::vec3(0.5f, 4.5f, 0.5f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
 
@@ -212,6 +213,9 @@ int main()
 	glm::mat4 pyramidModel = glm::mat4(1.0f);
 	pyramidModel = glm::translate(pyramidModel, pyramidPos);
 
+	glm::vec3 labyPos = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::mat4 labyModel = glm::mat4(1.0f);
+	labyModel = glm::translate(labyModel, labyPos);
 
 	lightShader.Activate();
 	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
@@ -242,7 +246,7 @@ int main()
 	static float f = 0.0f;
 	bool showProfiler = false;
 	bool show_MenuConnexion = false;
-	bool show_MenuSimulation = true;
+	bool show_MenuSimulation = false;
 
 	//io.Fonts->AddFontDefault();
 	ImFontConfig config;
@@ -253,8 +257,10 @@ int main()
 
 	float rotation = 0.0f;
 
+	Model model("models/laby/scene.gltf");
+
 	glEnable(GL_DEPTH_TEST);
-	Camera camera(width, height, glm::vec3(0.0f, 0.0f, 2.0f));
+	Camera camera(width, height, glm::vec3(0.0f, 2.0f, 2.0f));
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -267,7 +273,7 @@ int main()
 			continue;
 		}
 		lastTime = time;
-		rotation += (float) 1.f * deltaTime;
+		rotation += 1.f * (float)deltaTime;
 		//lightModel = glm::rotate(lightModel, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
 		//lightModel = glm::translate(lightModel, glm::vec3(0, 0.1*deltaTime, 0.0f));
 		lightShader.Activate();
@@ -279,13 +285,15 @@ int main()
 		glUniform3f(glGetUniformLocation(shaderProgram.ID, "lightPos"), lightModel[3].x, lightModel[3].y, lightModel[3].z);
 		glUniform3f(glGetUniformLocation(shaderProgram.ID, "camPos"), camera.Position.x, camera.Position.y, camera.Position.z);
 		floor.Draw(shaderProgram,camera);
-		light.Draw(lightShader,camera);
+
+		light.Draw(lightShader,camera,lightModel);	
+		model.Draw(shaderProgram,camera);
 		
 		
 		//VAO1.Unbind();
 		VAO2.Bind();
 		shaderLigne.Activate();
-		glDrawElements(GL_LINES, Line::number*2, GL_UNSIGNED_INT,0);
+		//glDrawElements(GL_LINES, Line::number*2, GL_UNSIGNED_INT,0);
 		VAO2.Unbind();
 		//Line::drawLine(glm::vec2(0.4f, 2.0f), glm::vec2(0.1f, 0.05f), ImVec4(1.f, 2.f, 3.f, 1.f));
 
@@ -307,6 +315,10 @@ int main()
 				}
 				ImGui::EndMenu();
 			}
+			if (ImGui::BeginMenu("Simulation")) {
+				show_MenuSimulation = !show_MenuSimulation;
+				ImGui::EndMenu();
+			}
 			if (ImGui::BeginMenu("Options")) {
 				if (ImGui::MenuItem("Profiler")) {
 					showProfiler = !showProfiler;
@@ -326,7 +338,7 @@ int main()
 
 		if (show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window);
-
+		if(false)
 		{
 			static int counter = 0;
 			int width, height;
