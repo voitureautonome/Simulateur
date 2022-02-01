@@ -27,6 +27,7 @@
 #include "Mesh.h"
 #include "Model.h"
 #include "raycast.h"
+#include "Voiture.h"
 void tournerVecteur(glm::vec2 *v, float angle) {
 	float x2 = v->x * cos(angle) - v->y * sin(angle);
 	float y2 = v->x * sin(angle) + v->y * cos(angle);
@@ -182,7 +183,7 @@ int main()
 	// On applique les modifications � l'objet
 
 	glm::vec3 lightColor = glm::vec3(1.0f, 1.0f, 1.0f);
-	glm::vec3 lightPos = glm::vec3(0.5f, 4.5f, 0.5f);
+	glm::vec3 lightPos = glm::vec3(0.5f, 2.5f, 0.5f);
 	glm::mat4 lightModel = glm::mat4(1.0f);
 	lightModel = glm::translate(lightModel, lightPos);
 
@@ -243,8 +244,11 @@ int main()
 	float rotation = 0.0f;
 
 	Model model("models/laby/scene.gltf");
+	Model voit("models/car/car.gltf");
+	Voiture car(20.f);
 
 	glEnable(GL_DEPTH_TEST);
+
 	Camera camera(width, height, glm::vec3(0.0f, 2.0f, 2.0f));
 
 	while (!glfwWindowShouldClose(window))
@@ -258,7 +262,15 @@ int main()
 			continue;
 		}
 		lastTime = time;
-		rotation += 1.f * (float)deltaTime;
+
+		car.controleVoiture(window,deltaTime);
+
+		rotation += 0.02f * (float)deltaTime;
+		voit.position += glm::vec3(rotation, 0.f, 0.f);
+		//car.Model.position += glm::vec3(rotation, 0.f, 0.f);
+		//voit.rotation = glm::quat(glm::vec3(0.f, glm::radians(90.f), 0.f));
+		//car.Model.rotation = glm::quat(glm::vec3(0.f, glm::radians(90.f), 0.f));
+
 		//lightModel = glm::rotate(lightModel, glm::radians(rotation), glm::vec3(0.0f, 1.0f, 0.0f));
 		//lightModel = glm::translate(lightModel, glm::vec3(0, 0.1*deltaTime, 0.0f));
 		lightShader.Activate();
@@ -276,9 +288,11 @@ int main()
 
 		light.Draw(lightShader,camera,lightModel);	
 		model.Draw(shaderProgram,camera);
+		car.Draw(shaderProgram, camera);
+		//voit.Draw(shaderProgram, camera);
+		//voit.Draw(shaderProgram, camera);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(triModel));
 		triAngle.Draw(shaderProgram,camera);
-		light.Draw(lightShader,camera);
 		
 		
 		//VAO1.Unbind();
@@ -327,9 +341,9 @@ int main()
 			ImGui::EndMainMenuBar();
 		}
 
-		if (show_demo_window)
+		if (!show_demo_window)
 			ImGui::ShowDemoWindow(&show_demo_window);
-		if(false)
+		if(true)
 		{
 			static int counter = 0;
 			int width, height;

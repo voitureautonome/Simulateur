@@ -3,3 +3,10 @@
 ################################################################################
 
 /.vs/Simulateur
+/Simulateur/Debug
+/Debug
+/Simulateur/libs/glfw/build/.vs
+/Simulateur/libs/glfw/build/CMakeFiles
+/Simulateur/libs/glfw/build
+/Simulateur/x64/Debug
+/Simulateur/x64/Release

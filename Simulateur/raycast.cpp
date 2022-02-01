@@ -242,6 +242,45 @@ bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDire
 	}
 }
 
+bool RayIntersectsTriangle(glm::vec3 rayOrigin,
+	glm::vec3 rayVector,
+	Vertex* inTriangle,
+	glm::vec3& outIntersectionPoint)
+{
+	const float EPSILON = 0.0000001;
+	glm::vec3 vertex0 = inTriangle[0].position;
+	glm::vec3 vertex1 = inTriangle[1].position;
+	glm::vec3 vertex2 = inTriangle[2].position;
+	glm::vec3 edge1, edge2, h, s, q;
+	float a, f, u, v;
+	edge1 = vertex1 - vertex0;
+	edge2 = vertex2 - vertex0;
+	h = glm::cross(rayVector, edge2);
+	a = glm::dot(edge1, h);
+	if (a > -EPSILON && a < EPSILON)
+		return false;    // Le rayon est parallèle au triangle.
+
+	f = 1.0 / a;
+	s = rayOrigin - vertex0;
+	u = f * glm::dot(s, h);
+	if (u < 0.0 || u > 1.0)
+		return false;
+	q = glm::cross(s, edge1);
+	v = f * glm::dot(rayVector, q);
+	if (v < 0.0 || u + v > 1.0)
+		return false;
+
+	// On calcule t pour savoir ou le point d'intersection se situe sur la ligne.
+	float t = f * glm::dot(edge2, q);
+	if (t > EPSILON) // Intersection avec le rayon
+	{
+		outIntersectionPoint = rayOrigin + rayVector * t;
+		return true;
+	}
+	else // On a bien une intersection de droite, mais pas de rayon.
+		return false;
+}
+
 float distance(glm::vec2 A, glm::vec2 B) {
 	return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
 }

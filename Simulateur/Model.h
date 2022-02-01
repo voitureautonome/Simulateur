@@ -8,7 +8,11 @@ using json = nlohmann::json;
 class Model
 {
 public:
+	glm::vec3 position;
+	glm::quat rotation;
+	std::vector<Mesh> meshes;
 	Model(const char* file);
+	Model();
 	void Draw(Shader& shader, Camera& camera);
 private:
 	glm::mat4 model;
@@ -16,7 +20,7 @@ private:
 	std::vector<unsigned char> data;
 	json JSON;
 	//info sur la position et la rotation
-	std::vector<Mesh> meshes;
+	//std::vector<Mesh> meshes;
 	std::vector<glm::vec3> translationsMeshes;
 	std::vector<glm::quat> rotationsMeshes;
 	std::vector<glm::vec3> scalesMeshes;

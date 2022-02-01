@@ -11,11 +11,15 @@ Model::Model(const char* file)
 	traverseNode(0);
 }
 
+Model::Model()
+{
+}
+
 void Model::Draw(Shader& shader, Camera& camera)
 {
 	for (unsigned int i = 0; i < meshes.size(); i++)
 	{
-		meshes[i].Mesh::Draw(shader, camera, matricesMeshes[i]);
+		meshes[i].Mesh::Draw(shader, camera, glm::translate(matricesMeshes[i], position)*glm::toMat4(rotation));
 	}
 }
 
