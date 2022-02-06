@@ -285,11 +285,11 @@ float distance(glm::vec2 A, glm::vec2 B) {
 	return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
 }
 
-void rayCastTriangle(Vertex* triangle, glm::vec2 rayStart, glm::vec2 rayDirection) {
+void rayCastTriangle(triangle tri, glm::vec2 rayStart, glm::vec2 rayDirection) {
 	
-	glm::vec2 pointA = glm::vec2(triangle[0].position.x, triangle[0].position.z);
-	glm::vec2 pointB = glm::vec2(triangle[1].position.x, triangle[1].position.z);
-	glm::vec2 pointC = glm::vec2(triangle[2].position.x, triangle[2].position.z);
+	glm::vec2 pointA = glm::vec2(tri.angle[0].x, tri.angle[0].z);
+	glm::vec2 pointB = glm::vec2(tri.angle[1].x, tri.angle[1].z);
+	glm::vec2 pointC = glm::vec2(tri.angle[2].x, tri.angle[2].z);
 
 	glm::vec2 res = glm::vec2(-999.f, -999.f);
 	glm::vec2 resAB, resAC, resBC;
@@ -345,6 +345,65 @@ void rayCastTriangle(Vertex* triangle, glm::vec2 rayStart, glm::vec2 rayDirectio
 //
 //}
 
+void simuLidar(Model laby, Model voit) {
+
+	// Parcours de chaque mesh du modèle
+	for (size_t i = 0; i < laby.meshes.size(); i++)
+	{
+
+		std::vector<triangle> vecTri;
+		std::cout << "MESH num " << i << std::endl;
+		std::cout << "NOMBRE DE VERTICES " << laby.meshes[i].vertices.size() << std::endl;
+
+		int numTri = 0;
+		for (size_t j = 0; j < laby.meshes[i].vertices.size(); j+=3)
+		{
+			// On vérifie qu'il y au moins 3 angles pour former un triangle
+			if (j+2 < laby.meshes[i].vertices.size())
+			{
+				numTri++;
+
+				// On récupère les indices de chaque angle du triangle
+				int indice1 = laby.meshes[i].indices[j];
+				int indice2 = laby.meshes[i].indices[j+1];
+				int indice3 = laby.meshes[i].indices[j+2];
+				// On crée un triangle en lui passant les coordonnées de ses 3 angles
+				triangle tri;
+				tri.angle[0] = laby.meshes[i].vertices[indice1].position;
+				tri.angle[1] = laby.meshes[i].vertices[indice2].position;
+				tri.angle[2] = laby.meshes[i].vertices[indice3].position;
+				
+				std::cout << "TRIANGLE NUM " << numTri << std::endl;
+				std::cout << "angle 1 " << glm::to_string(laby.meshes[i].vertices[indice1].position) << std::endl;
+				std::cout << "angle 2 " << glm::to_string(laby.meshes[i].vertices[indice2].position) << std::endl;
+				std::cout << "angle 3 " << glm::to_string(laby.meshes[i].vertices[indice3].position) << std::endl;
+
+				// On ajoute les triangles à notre tableau
+				vecTri.push_back(tri);
+			}
+		}
+
+		glm::vec2 origine2D = glm::vec2(voit.position.x, voit.position.z);
+		glm::vec2 dir2D = glm::vec2(-1.f, -1.f);
+
+		for (size_t i = 0; i < vecTri.size(); i++)
+		{
+			rayCastTriangle(vecTri[i], origine2D, dir2D);
+		}
+		
+	}
+
+	/*
+	for (size_t i = 0; i < laby.meshes[0].indices.size(); i++)
+	{
+		std::cout << "INDICE " << i << " || VALEUR " << laby.meshes[0].indices[i] << std::endl;
+
+	}
+	std::cout << glm::to_string(laby.meshes[0].vertices[35].position) << std::endl;
+	std::cout << glm::to_string(laby.meshes[0].vertices[38].position) << std::endl;
+	std::cout << glm::to_string(laby.meshes[0].vertices[11].position) << std::endl;
+	*/
+}
 
 
 int test2(glm::mat4 model) {
@@ -363,7 +422,7 @@ int test2(glm::mat4 model) {
 	glm::vec2 origine2D = glm::vec2(2.f, 1.f);
 	glm::vec2 dir2D = glm::vec2(-1.f, -1.f);
 
-	rayCastTriangle(triangle, origine2D, dir2D);
+	//rayCastTriangle(triangle, origine2D, dir2D);
 
 	/*
 	glm::vec3 origine = glm::vec3(-0.5f, -2.f, -0.5f);

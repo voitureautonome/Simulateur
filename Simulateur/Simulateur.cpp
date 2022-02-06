@@ -199,7 +199,7 @@ int main()
 	triModel = glm::translate(triModel, triPos);
 	//triModel = glm::rotate(triModel, glm::radians(45.f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-	test2(triModel);
+	//test2(triModel);
 
 	lightShader.Activate();
 	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
@@ -246,6 +246,8 @@ int main()
 	Model model("models/laby/scene.gltf");
 	Model voit("models/car/car.gltf");
 	Voiture car(20.f);
+
+	simuLidar(model, voit);
 
 	glEnable(GL_DEPTH_TEST);
 

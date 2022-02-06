@@ -4,6 +4,7 @@
 #include <iostream>
 #include <glm/gtx/string_cast.hpp>
 #include <cmath>
+#include "Model.h"
 #include "VBO.h"
 
 
@@ -30,9 +31,15 @@
 
 //int test();
 
+struct triangle
+{
+	glm::vec3 angle[3];
+};
+
+
 bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDirection, glm::vec2& res);
 float distance(glm::vec2 A, glm::vec2 B);
-void rayCastTriangle(Vertex* triangle, glm::vec2 rayStart, glm::vec2 rayDirection);
-
+void rayCastTriangle(triangle angle, glm::vec2 rayStart, glm::vec2 rayDirection);
+void simuLidar(Model laby, Model voit);
 
 int test2(glm::mat4 model);
