@@ -1,5 +1,6 @@
 #include "Voiture.h"
 #include <glm/gtx/string_cast.hpp>
+#include <iostream>
 
 Voiture::Voiture():Model::Model("models/car/car.gltf")
 {
@@ -13,6 +14,7 @@ Voiture::Voiture(float vitesse):Model::Model("models/car/car.gltf")
 void Voiture::controleVoiture(GLFWwindow* window,double deltaTime)
 {
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+		std::cout << "UP" << std::endl;
 		this->position += glm::vec3(this->vitesse * deltaTime, 0.f, 0.f);
 	}
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {

@@ -14,8 +14,9 @@ public:
 	Model(const char* file);
 	Model();
 	void Draw(Shader& shader, Camera& camera);
-private:
 	glm::mat4 model;
+
+private:
 	const char* file;
 	std::vector<unsigned char> data;
 	json JSON;

@@ -39,7 +39,7 @@ struct triangle
 
 bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDirection, glm::vec2& res);
 float distance(glm::vec2 A, glm::vec2 B);
-void rayCastTriangle(triangle angle, glm::vec2 rayStart, glm::vec2 rayDirection);
+float rayCastTriangle(triangle angle, glm::vec2 rayStart, glm::vec2 rayDirection);
 void simuLidar(Model laby, Model voit);
 
 int test2(glm::mat4 model);

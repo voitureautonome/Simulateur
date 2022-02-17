@@ -1,4 +1,5 @@
 #include "Model.h"
+#include <glm/gtx/string_cast.hpp>
 
 Model::Model(const char* file)
 {
@@ -11,15 +12,34 @@ Model::Model(const char* file)
 	traverseNode(0);
 }
 
-Model::Model()
-{
-}
-
 void Model::Draw(Shader& shader, Camera& camera)
 {
+	//std::cout << "Tableau d'indices" << std::endl;
+	//for (int i = 0; i < meshes[0].indices.size(); i++)
+	//{
+	//	std::cout << meshes[0].indices[i];
+	//	std::cout << std::endl;
+
+	//}
+
 	for (unsigned int i = 0; i < meshes.size(); i++)
 	{
-		meshes[i].Mesh::Draw(shader, camera, glm::translate(matricesMeshes[i], position)*glm::toMat4(rotation));
+		//std::cout << "Mesh numero " << i << std::endl;
+		//for (int j = 0; j < meshes[i].vertices.size(); j++)
+		//{
+		//	std::cout << "Vertex numero " << j << std::endl;
+		//	std::cout << glm::to_string(meshes[i].vertices[j].position) << std::endl;
+		//}
+
+		meshes[i].Mesh::Draw(shader, camera, glm::translate(matricesMeshes[i], position) * glm::toMat4(rotation));
+
+		//std::cout << glm::to_string(matricesMeshes[i]) << std::endl;
+		//std::cout << "Mesh numero " << i << std::endl;
+		//for (int j = 0; j < meshes[i].vertices.size(); j++)
+		//{
+		//	std::cout << "Vertex numero " << j << std::endl;
+		//	std::cout << glm::to_string(meshes[i].vertices[j].position) << std::endl;
+		//}
 	}
 }
 

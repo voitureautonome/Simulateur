@@ -247,7 +247,8 @@ int main()
 	Model voit("models/car/car.gltf");
 	Voiture car(20.f);
 
-	simuLidar(model, voit);
+
+	double compteur = 0.f;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -266,6 +267,13 @@ int main()
 		lastTime = time;
 
 		car.controleVoiture(window,deltaTime);
+
+		compteur += deltaTime;
+		if (compteur > 2.f)
+		{
+			simuLidar(model, car);
+			compteur = 0;
+		}
 
 		rotation += 0.02f * (float)deltaTime;
 		voit.position += glm::vec3(rotation, 0.f, 0.f);

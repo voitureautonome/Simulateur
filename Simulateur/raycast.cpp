@@ -236,6 +236,7 @@ bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDire
 	const float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
 	if (t > 0 && t < 1 && u > 0) {
 		res = glm::vec2(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+		return true;
 	}
 	else {
 		return false;
@@ -285,7 +286,7 @@ float distance(glm::vec2 A, glm::vec2 B) {
 	return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
 }
 
-void rayCastTriangle(triangle tri, glm::vec2 rayStart, glm::vec2 rayDirection) {
+float rayCastTriangle(triangle tri, glm::vec2 rayStart, glm::vec2 rayDirection) {
 	
 	glm::vec2 pointA = glm::vec2(tri.angle[0].x, tri.angle[0].z);
 	glm::vec2 pointB = glm::vec2(tri.angle[1].x, tri.angle[1].z);
@@ -322,8 +323,9 @@ void rayCastTriangle(triangle tri, glm::vec2 rayStart, glm::vec2 rayDirection) {
 			longueur = dist;
 		}
 	}
-	std::cout << "resultat : " << glm::to_string(res) << std::endl;
-	std::cout << "longueur : " << longueur << std::endl;
+	//std::cout << "resultat : " << glm::to_string(res) << std::endl;
+	// std::cout << "longueur : " << longueur << std::endl;
+	return longueur;
 
 }
 
@@ -352,8 +354,8 @@ void simuLidar(Model laby, Model voit) {
 	{
 
 		std::vector<triangle> vecTri;
-		std::cout << "MESH num " << i << std::endl;
-		std::cout << "NOMBRE DE VERTICES " << laby.meshes[i].vertices.size() << std::endl;
+		// std::cout << "MESH num " << i << std::endl;
+		// std::cout << "NOMBRE DE VERTICES " << laby.meshes[i].vertices.size() << std::endl;
 
 		int numTri = 0;
 		for (size_t j = 0; j < laby.meshes[i].vertices.size(); j+=3)
@@ -369,27 +371,42 @@ void simuLidar(Model laby, Model voit) {
 				int indice3 = laby.meshes[i].indices[j+2];
 				// On crée un triangle en lui passant les coordonnées de ses 3 angles
 				triangle tri;
+
 				tri.angle[0] = laby.meshes[i].vertices[indice1].position;
 				tri.angle[1] = laby.meshes[i].vertices[indice2].position;
 				tri.angle[2] = laby.meshes[i].vertices[indice3].position;
 				
-				std::cout << "TRIANGLE NUM " << numTri << std::endl;
-				std::cout << "angle 1 " << glm::to_string(laby.meshes[i].vertices[indice1].position) << std::endl;
-				std::cout << "angle 2 " << glm::to_string(laby.meshes[i].vertices[indice2].position) << std::endl;
-				std::cout << "angle 3 " << glm::to_string(laby.meshes[i].vertices[indice3].position) << std::endl;
+				//std::cout << "TRIANGLE NUM " << numTri << std::endl;
+				//std::cout << "angle 1 " << glm::to_string(laby.meshes[i].vertices[indice1].position) << std::endl;
+				//std::cout << "angle 2 " << glm::to_string(laby.meshes[i].vertices[indice2].position) << std::endl;
+				//std::cout << "angle 3 " << glm::to_string(laby.meshes[i].vertices[indice3].position) << std::endl;
 
 				// On ajoute les triangles à notre tableau
 				vecTri.push_back(tri);
 			}
 		}
 
-		glm::vec2 origine2D = glm::vec2(voit.position.x, voit.position.z);
-		glm::vec2 dir2D = glm::vec2(-1.f, -1.f);
+		glm::vec3 posOrigine = voit.position;
+
+		glm::vec2 origine2D = glm::vec2(posOrigine.x, posOrigine.z);
+		glm::vec2 dir2D = glm::normalize(glm::vec2(1.f, 0.f));
+
+		double min = 1e+07;
 
 		for (size_t i = 0; i < vecTri.size(); i++)
 		{
-			rayCastTriangle(vecTri[i], origine2D, dir2D);
+			float longueur = rayCastTriangle(vecTri[i], origine2D, dir2D);
+			std::cout << "==========================================================" << std::endl;
+			std::cout << "  Triangle " << i << " : " << longueur << std::endl;
+			std::cout << "  Angles: " << glm::to_string(vecTri[i].angle[0]) << " " << glm::to_string(vecTri[i].angle[1]) << " " << glm::to_string(vecTri[i].angle[2]) << std::endl;
+
+			if (longueur < min)
+				min = longueur;
 		}
+		std::cout << "==========================================================" << std::endl;
+		std::cout << "  Voiture " << i << " : " << glm::to_string(voit.position) << std::endl;
+
+		std::cout << "longueur minimum: " << min << std::endl;
 		
 	}
 
