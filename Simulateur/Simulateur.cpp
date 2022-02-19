@@ -268,6 +268,7 @@ int main()
 
 		car.controleVoiture(window,deltaTime);
 
+		//testRaycast();
 		compteur += deltaTime;
 		if (compteur > 2.f)
 		{

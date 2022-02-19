@@ -42,4 +42,4 @@ float distance(glm::vec2 A, glm::vec2 B);
 float rayCastTriangle(triangle angle, glm::vec2 rayStart, glm::vec2 rayDirection);
 void simuLidar(Model laby, Model voit);
 
-int test2(glm::mat4 model);
+int testRaycast();
