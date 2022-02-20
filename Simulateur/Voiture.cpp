@@ -1,5 +1,6 @@
 #include "Voiture.h"
 #include <glm/gtx/string_cast.hpp>
+#include <iostream>
 
 Voiture::Voiture():Model::Model("models/car/car.gltf")
 {

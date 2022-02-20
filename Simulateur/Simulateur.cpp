@@ -186,7 +186,7 @@ int main()
 	triModel = glm::translate(triModel, triPos);
 	//triModel = glm::rotate(triModel, glm::radians(45.f), glm::vec3(1.0f, 0.0f, 0.0f));
 
-	test2(triModel);
+	//test2(triModel);
 
 	lightShader.Activate();
 	glUniformMatrix4fv(glGetUniformLocation(lightShader.ID, "model"), 1, GL_FALSE, glm::value_ptr(lightModel));
@@ -227,6 +227,9 @@ int main()
 	glm::translate(uv.model, glm::vec3(0.f, 2.f, 0.f));
 	uv.position = model.meshes[0].vertices[0].position;
 	Voiture car(20.f);
+
+
+	double compteur = 0.f;
 
 	glEnable(GL_DEPTH_TEST);
 
@@ -277,6 +280,14 @@ int main()
 		lastTime = time;
 
 		car.controleVoiture(window,deltaTime);
+
+		compteur += deltaTime;
+		if (compteur > 2.f)
+		{
+			simuLidar(model, car);
+			//testRaycast();
+			compteur = 0;
+		}
 
 		rotation += 0.02f * (float)deltaTime;
 		voit.position += glm::vec3(rotation, 0.f, 0.f);

@@ -1,222 +1,16 @@
 #include "raycast.h"
 
 
-//
-//bool TestRayOBBIntersection(
-//	glm::vec3 ray_origin,        // Ray origin, in world space
-//	glm::vec3 ray_direction,     // Ray direction (NOT target position!), in world space. Must be normalize()'d.
-//	glm::vec3 aabb_min,          // Minimum X,Y,Z coords of the mesh when not transformed at all.
-//	glm::vec3 aabb_max,          // Maximum X,Y,Z coords. Often aabb_min*-1 if your mesh is centered, but it's not always the case.
-//	glm::mat4 ModelMatrix,       // Transformation applied to the mesh (which will thus be also applied to its bounding box)
-//	float& intersection_distance // Output : distance between ray_origin and the intersection with the OBB
-//) {
-//
-//	// Intersection method from Real-Time Rendering and Essential Mathematics for Games
-//
-//	float tMin = 0.0f;
-//	float tMax = 100000.0f;
-//
-//	glm::vec3 OBBposition_worldspace(ModelMatrix[3].x, ModelMatrix[3].y, ModelMatrix[3].z);
-//
-//	glm::vec3 delta = OBBposition_worldspace - ray_origin;
-//
-//	// Test intersection with the 2 planes perpendicular to the OBB's X axis
-//	{
-//		glm::vec3 xaxis(ModelMatrix[0].x, ModelMatrix[0].y, ModelMatrix[0].z);
-//		float e = glm::dot(xaxis, delta);
-//		float f = glm::dot(ray_direction, xaxis);
-//
-//		if (fabs(f) > 0.001f) { // Standard case
-//
-//			float t1 = (e + aabb_min.x) / f; // Intersection with the "left" plane
-//			float t2 = (e + aabb_max.x) / f; // Intersection with the "right" plane
-//			// t1 and t2 now contain distances betwen ray origin and ray-plane intersections
-//
-//			// We want t1 to represent the nearest intersection, 
-//			// so if it's not the case, invert t1 and t2
-//			if (t1 > t2) {
-//				float w = t1; t1 = t2; t2 = w; // swap t1 and t2
-//			}
-//
-//			// tMax is the nearest "far" intersection (amongst the X,Y and Z planes pairs)
-//			if (t2 < tMax)
-//				tMax = t2;
-//			// tMin is the farthest "near" intersection (amongst the X,Y and Z planes pairs)
-//			if (t1 > tMin)
-//				tMin = t1;
-//
-//			// And here's the trick :
-//			// If "far" is closer than "near", then there is NO intersection.
-//			// See the images in the tutorials for the visual explanation.
-//			if (tMax < tMin)
-//				return false;
-//
-//		}
-//		else { // Rare case : the ray is almost parallel to the planes, so they don't have any "intersection"
-//			if (-e + aabb_min.x > 0.0f || -e + aabb_max.x < 0.0f)
-//				return false;
-//		}
-//	}
-//
-//
-//	// Test intersection with the 2 planes perpendicular to the OBB's Y axis
-//	// Exactly the same thing than above.
-//	{
-//		glm::vec3 yaxis(ModelMatrix[1].x, ModelMatrix[1].y, ModelMatrix[1].z);
-//		float e = glm::dot(yaxis, delta);
-//		float f = glm::dot(ray_direction, yaxis);
-//
-//		if (fabs(f) > 0.001f) {
-//
-//			float t1 = (e + aabb_min.y) / f;
-//			float t2 = (e + aabb_max.y) / f;
-//
-//			if (t1 > t2) { float w = t1; t1 = t2; t2 = w; }
-//
-//			if (t2 < tMax)
-//				tMax = t2;
-//			if (t1 > tMin)
-//				tMin = t1;
-//			if (tMin > tMax)
-//				return false;
-//
-//		}
-//		else {
-//			if (-e + aabb_min.y > 0.0f || -e + aabb_max.y < 0.0f)
-//				return false;
-//		}
-//	}
-//
-//
-//	// Test intersection with the 2 planes perpendicular to the OBB's Z axis
-//	// Exactly the same thing than above.
-//	{
-//		glm::vec3 zaxis(ModelMatrix[2].x, ModelMatrix[2].y, ModelMatrix[2].z);
-//		float e = glm::dot(zaxis, delta);
-//		float f = glm::dot(ray_direction, zaxis);
-//
-//		if (fabs(f) > 0.001f) {
-//
-//			float t1 = (e + aabb_min.z) / f;
-//			float t2 = (e + aabb_max.z) / f;
-//
-//			if (t1 > t2) { float w = t1; t1 = t2; t2 = w; }
-//
-//			if (t2 < tMax)
-//				tMax = t2;
-//			if (t1 > tMin)
-//				tMin = t1;
-//			if (tMin > tMax)
-//				return false;
-//
-//		}
-//		else {
-//			if (-e + aabb_min.z > 0.0f || -e + aabb_max.z < 0.0f)
-//				return false;
-//		}
-//	}
-//
-//	intersection_distance = tMin;
-//	return true;
-//
-//}
+float intersection(float a1, float b1, float a2, float b2) {
+	// On cherche à trouver où les droites se croisent donc à résoudre a1x + b1 = a2x + b2 
+	// on pose l'équation (a1x + b1) - (a2x + b2) = 0
+	// on factorise par x :  x(a1 - a2) + (b1 - b2) = 0
+	// on trouve x = (b2 - b1) / (a1 - a2)
 
+	return (b2 - b1) / (a1 - a2);
+}
 
-//glm::vec3 raycastCarre(
-//	glm::vec3 &rayOrigin, // Origine du rayon
-//	glm::vec3 &rayDirection, // Direction du rayon
-//	glm::vec3 *mursVertices, // Tableau contenant les 2 vertices de chaque mur (MUR1 pointA [0] pointB [1], MUR2 pointA [2] pointB [3]...)
-//	int nbMurs, // Nombre de murs pour la taille des tableaux
-//	glm::mat4 *modelMatrix // Tableau des matrices représentant chaque mur
-//	) 
-//{
-//	float minDist = 10000.f;
-//	// On parcourt le tableau de murs
-//	for (int i = 0; i < nbMurs; i++)
-//	{
-//		float dist = 10000.f;
-//		bool res = TestRayOBBIntersection(rayOrigin, rayDirection, mursVertices[i * 2], mursVertices[i * 2 + 1], modelMatrix[i], dist);
-//		if (minDist > dist)
-//		{
-//			minDist = dist;
-//		}
-//	}
-//	std::cout << minDist << std::endl;
-//	glm::vec3 pos = rayOrigin + rayDirection * minDist;
-//	return pos;
-//}
-
-//int test() {
-//	glm::vec3 origine = glm::vec3(0.f, 0.f, 0.f);
-//	glm::vec3 direction = glm::vec3(1.5f, 0.f, 1.f);
-//	std::cout << glm::to_string(glm::normalize(direction)) << std::endl;
-//	glm::vec3 direcNormalise = glm::normalize(direction);
-//
-//	glm::vec3 mur1A = glm::vec3(3.f, 0.f, 1.f);
-//	glm::vec3 mur1B = glm::vec3(3.f, 0.f, 5.f);
-//	glm::vec3 mur2A = glm::vec3(6.f, 1.f, 0.f);
-//	glm::vec3 mur2B = glm::vec3(6.f, 10.f, 0.f);
-//
-//	glm::vec3 tab[4];
-//	tab[0] = mur1A;
-//	tab[1] = mur1B;
-//	tab[2] = mur2A;
-//	tab[3] = mur2B;
-//
-//	glm::mat4 matrix1 = glm::mat4(1.f);
-//	glm::mat4 matrix2 = glm::mat4(2.f);
-//	glm::mat4 mat[2];
-//	mat[0] = matrix1;
-//	mat[1] = matrix2;
-//
-//	glm::vec3 pos = raycastCarre(origine, direcNormalise, tab, 2, mat);
-//
-//	std::cout << glm::to_string(pos)<<std::endl;
-//
-//	return 0;
-//}
-
-//glm::vec3 triIntersect(glm::vec3 ro, glm::vec3 rd, Vertex* triangle, glm::mat4 model)
-//{
-//	// On applique le modèle du monde au triangle pour obtenir les coordonées des sommets dans le monde
-//	glm::vec4 vec41 = model * glm::vec4(triangle[0].position, 1.0);
-//	glm::vec3 vec31 = glm::vec3(vec41);
-//	glm::vec4 vec42 = model * glm::vec4(triangle[1].position, 1.0);
-//	glm::vec3 vec32 = glm::vec3(vec42);
-//	glm::vec4 vec43 = model * glm::vec4(triangle[2].position, 1.0);
-//	glm::vec3 vec33 = glm::vec3(vec43);
-//	
-//	std::cout << "Ray Origine : " << (glm::to_string(ro)) << std::endl;
-//	std::cout << "Ray Direction : " << (glm::to_string(rd)) << std::endl;
-//	std::cout << "Sommet1 : " << (glm::to_string(vec31)) << std::endl;
-//	std::cout << "Sommet2 : " << (glm::to_string(vec32)) << std::endl;
-//	std::cout << "Sommet3 : " << (glm::to_string(vec33)) << std::endl;
-//
-//	glm::vec3 v1v0 = vec32 - vec31;
-//	glm::vec3 v2v0 = vec33 - vec31;
-//	glm::vec3 rov0 = ro - vec31;
-//	std::cout << "roV0 : " << (glm::to_string(rov0)) << std::endl;
-//	std::cout << "v1v0 : " << (glm::to_string(v1v0)) << std::endl;
-//	std::cout << "v2V0 : " << (glm::to_string(v2v0)) << std::endl;
-//
-//
-//	glm::vec3  n = glm::cross(v1v0, v2v0); // cross produit vectoriel
-//	glm::vec3  q = glm::cross(rov0, rd);
-//	std::cout << "cross v1v0, v2v0 : " << (glm::to_string(n)) << std::endl;
-//	std::cout << "cross roV0, rd: " << (glm::to_string(q)) << std::endl;
-//
-//
-//	float d = 1.0f / dot(rd, n); // dot produit scalaire
-//	float u = d * dot(-q, v2v0);
-//	float v = d * dot(q, v1v0)	;
-//	float t = d * dot(-n, rov0);
-//	if (u < 0.0f || u>1.0f || v < 0.0f || (u + v)>1.0f)
-//		t = -1.0f;
-//	//return glm::vec3(model * glm::vec4(glm::vec3(t, u, v),1.0f));
-//	return glm::vec3(t, u, v);
-//}
-
-bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDirection, glm::vec2 &res) {
+bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDirection, glm::vec2& res) {
 	const float x1 = wp1.x;
 	const float y1 = wp1.y;
 	const float x2 = wp2.x;
@@ -227,69 +21,80 @@ bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDire
 	const float x4 = rayStart.x + rayDirection.x;
 	const float y4 = rayStart.y + rayDirection.y;
 
-	const float den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-	if (den == 0) {
-		return false;
-	}
+	// equation de droite ax + b
 
-	const float t = ((x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)) / den;
-	const float u = -((x1 - x2) * (y1 - y3) - (y1 - y2) * (x1 - x3)) / den;
-	if (t > 0 && t < 1 && u > 0) {
-		res = glm::vec2(x1 + t * (x2 - x1), y1 + t * (y2 - y1));
+	float a1, a2;
+	// Si la droite est verticale, on met le coeff directeur au max
+	if (x2 - x1 == 0)
+	{
+		a1 = 107374176;
 	}
 	else {
+		// coefficient directeur de la droite représentant le mur
+		a1 = (y2 - y1) / (x2 - x1);
+	}
+	// Si la droite est verticale, on met le coeff directeur au max
+	if (x4 - x3 == 0)
+	{
+		a2 = 107374176;
+	}
+	else {
+		// coefficient directeur de la droite représentant le rayon
+		a2 = (y4 - y3) / (x4 - x3);
+	}
+
+
+	// Si les deux droites ont le même coeff directeur, elles sont parallèles
+	if (a1 == a2)
+	{
 		return false;
 	}
-}
 
-bool RayIntersectsTriangle(glm::vec3 rayOrigin,
-	glm::vec3 rayVector,
-	Vertex* inTriangle,
-	glm::vec3& outIntersectionPoint)
-{
-	const float EPSILON = 0.0000001;
-	glm::vec3 vertex0 = inTriangle[0].position;
-	glm::vec3 vertex1 = inTriangle[1].position;
-	glm::vec3 vertex2 = inTriangle[2].position;
-	glm::vec3 edge1, edge2, h, s, q;
-	float a, f, u, v;
-	edge1 = vertex1 - vertex0;
-	edge2 = vertex2 - vertex0;
-	h = glm::cross(rayVector, edge2);
-	a = glm::dot(edge1, h);
-	if (a > -EPSILON && a < EPSILON)
-		return false;    // Le rayon est parallèle au triangle.
+	// Sinon on calcule leur ordonné à l'origine
+	float b1 = y1 - (a1 * x1);
+	float b2 = y3 - (a2 * x3);
 
-	f = 1.0 / a;
-	s = rayOrigin - vertex0;
-	u = f * glm::dot(s, h);
-	if (u < 0.0 || u > 1.0)
-		return false;
-	q = glm::cross(s, edge1);
-	v = f * glm::dot(rayVector, q);
-	if (v < 0.0 || u + v > 1.0)
-		return false;
+	// On a alors deux droites a1x + b1 et a2x + b2
+	// On cherche pour quelle valeur de X elles se croisent
+	float resX = intersection(a1, b1, a2, b2);
 
-	// On calcule t pour savoir ou le point d'intersection se situe sur la ligne.
-	float t = f * glm::dot(edge2, q);
-	if (t > EPSILON) // Intersection avec le rayon
+	// On remplace dans l'équation d'une des deux droites les coordonnées
+	float resY = a1 * resX + b1;
+
+	// Pour savoir si l'intersection se trouve dans le segment, on teste le produit scalaire pour savoir si AB.AC < AB.AB 
+	// Si c'est le cas, le point est dans le segment
+
+	glm::vec2 segmentAB = wp1 - wp2;
+	glm::vec2 segmentAC = wp1 - glm::vec2(resX, resY);
+
+	float prodSegmentAB = glm::dot(segmentAB, segmentAB);
+	float prodSegmentAC = glm::dot(segmentAB, segmentAC);
+
+	if (prodSegmentAC <= prodSegmentAB && prodSegmentAC >= 0)
 	{
-		outIntersectionPoint = rayOrigin + rayVector * t;
+		// On crée un vecteur avec les coordonnées de l'intersection, et on le met dans le résultat
+		res = glm::vec2(resX, resY);
 		return true;
 	}
-	else // On a bien une intersection de droite, mais pas de rayon.
+	else
 		return false;
+
 }
 
 float distance(glm::vec2 A, glm::vec2 B) {
 	return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
 }
 
-void rayCastTriangle(Vertex* triangle, glm::vec2 rayStart, glm::vec2 rayDirection) {
+float rayCastTriangle(triangle tri, glm::vec2 rayStart, glm::vec2 rayDirection) {
 	
-	glm::vec2 pointA = glm::vec2(triangle[0].position.x, triangle[0].position.z);
-	glm::vec2 pointB = glm::vec2(triangle[1].position.x, triangle[1].position.z);
-	glm::vec2 pointC = glm::vec2(triangle[2].position.x, triangle[2].position.z);
+	// On récupère 3 points en 2D, correspondant aux angles du triangle
+	glm::vec2 pointA = glm::vec2(tri.angle[0].x, tri.angle[0].z);
+	glm::vec2 pointB = glm::vec2(tri.angle[1].x, tri.angle[1].z);
+	glm::vec2 pointC = glm::vec2(tri.angle[2].x, tri.angle[2].z);
+
+	std::cout << "POINT A " << glm::to_string(pointA) << std::endl;
+	std::cout << "POINT B " << glm::to_string(pointB) << std::endl;
+	std::cout << "POINT C " << glm::to_string(pointC) << std::endl;
 
 	glm::vec2 res = glm::vec2(-999.f, -999.f);
 	glm::vec2 resAB, resAC, resBC;
@@ -297,7 +102,11 @@ void rayCastTriangle(Vertex* triangle, glm::vec2 rayStart, glm::vec2 rayDirectio
 	// On vérifie le côté du triangle AB
 	if (rayCast(pointA, pointB, rayStart, rayDirection, resAB)) {
 		float dist = distance(rayStart, resAB);
+		std::cout << "=====================================" << std::endl;
+
 		std::cout << "resultat AB : " << glm::to_string(resAB) << std::endl;
+		std::cout << "distance AB : " << dist << std::endl;
+
 		if (dist < longueur)
 		{
 			res = resAB;
@@ -307,6 +116,10 @@ void rayCastTriangle(Vertex* triangle, glm::vec2 rayStart, glm::vec2 rayDirectio
 	// On vérifie le côté du triangle AC
 	if (rayCast(pointA, pointC, rayStart, rayDirection, resAC)) {
 		float dist = distance(rayStart, resAC);
+		std::cout << "=====================================" << std::endl;
+		std::cout << "resultat AC : " << glm::to_string(resAC) << std::endl;
+		std::cout << "distance AC : " << dist << std::endl;
+
 		if (dist < longueur)
 		{
 			res = resAC;
@@ -316,54 +129,158 @@ void rayCastTriangle(Vertex* triangle, glm::vec2 rayStart, glm::vec2 rayDirectio
 	// On vérifie le côté du triangle BC
 	if (rayCast(pointB, pointC, rayStart, rayDirection, resBC)) {
 		float dist = distance(rayStart, resBC);
+		std::cout << "=====================================" << std::endl;
+		std::cout << "resultat BC : " << glm::to_string(resBC) << std::endl;
+		std::cout << "distance BC : " << dist << std::endl;
+
+
 		if (dist < longueur)
 		{
 			res = resBC;
 			longueur = dist;
 		}
 	}
-	std::cout << "resultat : " << glm::to_string(res) << std::endl;
-	std::cout << "longueur : " << longueur << std::endl;
+	//std::cout << "resultat : " << glm::to_string(res) << std::endl;
+	// std::cout << "longueur : " << longueur << std::endl;
+	return longueur;
 
 }
 
-//glm::vec3 RayIntersectTri(glm::vec3 origine, glm::vec3 direction, Vertex* triangle, glm::mat4 model, glm::vec3& intersection) {
-//	const float EPSILON = 0.0001;
-//
-//	glm::vec4 vec41 = model * glm::vec4(triangle[0].position, 1.0);
-//	glm::vec3 vec31 = glm::vec3(vec41);
-//	glm::vec4 vec42 = model * glm::vec4(triangle[1].position, 1.0);
-//	glm::vec3 vec32 = glm::vec3(vec42);
-//	glm::vec4 vec43 = model * glm::vec4(triangle[2].position, 1.0);
-//	glm::vec3 vec33 = glm::vec3(vec43);
-//
-//	glm::vec3 cote1 = vec32 - vec31;
-//	glm::vec3 cote2 = vec33 - vec31;
-//
-//	glm::vec3 h = glm::cross(direction, cote1);
-//	glm::vec3 a = glm::cross(h, cote2);
-//
-//}
+
+void simuLidar(Model laby, Model voit) {
+
+	// Parcours de chaque mesh du modèle
+	for (size_t i = 0; i < laby.meshes.size(); i++)
+	{
+
+		// On crée un tableau de triangles les stocker au fur et à mesure
+		std::vector<triangle> vecTri;
+
+		for (size_t j = 0; j < laby.meshes[i].vertices.size(); j+=3)
+		{
+			// On vérifie qu'il y au moins 3 angles pour former un triangle
+			if (j+2 < laby.meshes[i].vertices.size())
+			{
+
+				// On récupère les indices de chaque angle du triangle
+				int indice1 = laby.meshes[i].indices[j];
+				int indice2 = laby.meshes[i].indices[j+1];
+				int indice3 = laby.meshes[i].indices[j+2];
+				// On crée un triangle en lui passant les coordonnées de ses 3 angles
+				triangle tri;
+
+				tri.angle[0] = laby.meshes[i].vertices[indice1].position;
+				tri.angle[1] = laby.meshes[i].vertices[indice2].position;
+				tri.angle[2] = laby.meshes[i].vertices[indice3].position;
+				
+				//std::cout << "TRIANGLE NUM " << numTri << std::endl;
+				//std::cout << "angle 1 " << glm::to_string(laby.meshes[i].vertices[indice1].position) << std::endl;
+				//std::cout << "angle 2 " << glm::to_string(laby.meshes[i].vertices[indice2].position) << std::endl;
+				//std::cout << "angle 3 " << glm::to_string(laby.meshes[i].vertices[indice3].position) << std::endl;
+
+				// On ajoute les triangles à notre tableau
+				vecTri.push_back(tri);
+			}
+		}
+
+		glm::vec3 posOrigine = voit.position;
+
+		glm::vec2 origine2D = glm::vec2(posOrigine.x, posOrigine.z);
+		glm::vec2 dir2D = glm::normalize(glm::vec2(1.f, 0.f));
+
+		double min = 1e+07;
+
+		for (size_t i = 0; i < vecTri.size(); i++)
+		{
+			float longueur = rayCastTriangle(vecTri[i], origine2D, dir2D);
+			std::cout << "==========================================================" << std::endl;
+			std::cout << "  Triangle " << i << " : " << longueur << std::endl;
+			std::cout << "  Angles: " << glm::to_string(vecTri[i].angle[0]) << " " << glm::to_string(vecTri[i].angle[1]) << " " << glm::to_string(vecTri[i].angle[2]) << std::endl;
+
+			if (longueur < min)
+				min = longueur;
+		}
+		std::cout << "==========================================================" << std::endl;
+
+		std::cout << "  Voiture " << i << " : " << glm::to_string(voit.position) << " direction " << glm::to_string(dir2D) << std::endl;
+
+		std::cout << "longueur minimum: " << min << std::endl;
+		
+	}
+
+	/*
+	for (size_t i = 0; i < laby.meshes[0].indices.size(); i++)
+	{
+		std::cout << "INDICE " << i << " || VALEUR " << laby.meshes[0].indices[i] << std::endl;
+
+	}
+	std::cout << glm::to_string(laby.meshes[0].vertices[35].position) << std::endl;
+	std::cout << glm::to_string(laby.meshes[0].vertices[38].position) << std::endl;
+	std::cout << glm::to_string(laby.meshes[0].vertices[11].position) << std::endl;
+	*/
+}
 
 
-
-int test2(glm::mat4 model) {
+int testRaycast() {
 	/*
 	std::cout << "coordonnee x : " << model[3].x << std::endl;
 	std::cout << "coordonnee y : " << model[3].y << std::endl;
 	std::cout << "coordonnee z : " << model[3].z <<std::endl;
 	*/
 
-	Vertex triangle[] = {
-	Vertex{glm::vec3(-1.0f, 0.f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
-	Vertex{glm::vec3(-1.0f, 0.f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-	Vertex{glm::vec3(1.0f, 0.f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)}
-	};
+	//Vertex triangle[] = {
+	//Vertex{glm::vec3(-1.0f, 0.f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+	//Vertex{glm::vec3(-1.0f, 0.f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+	//Vertex{glm::vec3(1.0f, 0.f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)}
+	//};
 
 	glm::vec2 origine2D = glm::vec2(2.f, 1.f);
 	glm::vec2 dir2D = glm::vec2(-1.f, -1.f);
 
-	rayCastTriangle(triangle, origine2D, dir2D);
+	float a1 = 1;
+	float b1 = 0;
+	float a2 = -1;
+	float b2 = 6;
+
+	std::cout << " Intersection " << intersection(a1, b1, a2, b2) << std::endl;
+
+	glm::vec2 a = glm::vec2(2, 2);
+	glm::vec2 b = glm::vec2(4, 4);
+	glm::vec2 c = glm::vec2(2, 4);
+	glm::vec2 direction = glm::normalize(glm::vec2(1, -1));
+
+	glm::vec2 c2 = glm::vec2(0, 2);
+
+
+	glm::vec2 res, res2;
+
+	std::cout << "Test qui doit marcher Intersection ? " << rayCast(a, b, c, direction, res) << std::endl;
+	if (rayCast(a, b, c, direction, res))
+	{
+		std::cout << "Ou ? " << glm::to_string(res) << std::endl;
+	}
+
+	std::cout << "Test qui doit pas marcher Intersection ? " << rayCast(a, b, c2, direction, res2) << std::endl;
+	if (rayCast(a, b, c2, direction, res2))
+	{
+		std::cout << "Ou ? " << glm::to_string(res2) << std::endl;
+	}
+
+	triangle t;
+
+	t.angle[0] = glm::vec3(2, 0, 2);
+	t.angle[1] = glm::vec3(2, 2, 2);
+	t.angle[2] = glm::vec3(2, 0, -2);
+
+	glm::vec3 origine = glm::vec3(0, 0.5, 0);
+	glm::vec3 direction2 = glm::vec3(1, 0, 0);
+
+	float longueur = rayCastTriangle(t, origine, direction2);
+
+	std::cout << "Distance du triangle " << longueur << std::endl;
+
+
+	//rayCastTriangle(triangle, origine2D, dir2D);
 
 	/*
 	glm::vec3 origine = glm::vec3(-0.5f, -2.f, -0.5f);
