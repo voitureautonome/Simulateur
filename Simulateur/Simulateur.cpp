@@ -235,7 +235,7 @@ int main()
 
 	Camera camera(width, height, glm::vec3(0.0f, 2.0f, 2.0f));
 
-	const int nb = model.meshes.size();
+	int nb = (int) model.meshes.size();
 	int count = 0;
 	for (size_t i = 0; i < nb; i++)
 	{

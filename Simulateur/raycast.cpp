@@ -82,7 +82,7 @@ bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDire
 }
 
 float distance(glm::vec2 A, glm::vec2 B) {
-	return sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
+	return (float)sqrt(pow(B.x - A.x, 2) + pow(B.y - A.y, 2));
 }
 
 float rayCastTriangle(triangle tri, glm::vec2 rayStart, glm::vec2 rayDirection) {
