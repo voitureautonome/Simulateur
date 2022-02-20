@@ -4,15 +4,21 @@
 #include <stdlib.h>
 #include <glad/glad.h>
 #include <vector>
-#include "glm/vec2.hpp"
+#include "glm/vec3.hpp"
+#include "Camera.h"
+#include "shaderClass.h"
+#include "VAO.h"
 class Line {
 public:
-	static std::vector<GLfloat> listeLignes;
-	static std::vector<GLuint> listeIndices;
-	static int number;
-	static void initLines();
-	static int drawLine(glm::vec2 start, glm::vec2 end, ImVec4 color);
+	Line();
+	int number;
+	int count = 0;
+	VAO *VAO2;
+	VBO *VBO2;
+	int drawLine(glm::vec3 start, glm::vec3 end);
+	void Draw(Camera& camera);
+	void Clear();
+	Shader shaderLigne = Shader("ligne.vert", "ligne.frag");
+	GLfloat* lignes;
 };
-//int LinesNumbers;
-//GLuint* linesIndices;
 #endif

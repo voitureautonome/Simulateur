@@ -11,11 +11,11 @@ public:
 	glm::vec3 position;
 	glm::quat rotation;
 	std::vector<Mesh> meshes;
+	glm::mat4 model;
 	Model(const char* file);
 	Model();
 	void Draw(Shader& shader, Camera& camera);
 private:
-	glm::mat4 model;
 	const char* file;
 	std::vector<unsigned char> data;
 	json JSON;

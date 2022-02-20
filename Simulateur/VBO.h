@@ -24,7 +24,10 @@ public:
 	//Cnstruit un VBO et le relie a ses sommets
 	VBO(GLfloat* vertices, GLsizeiptr size);
 	VBO(std::vector<GLfloat>* _vector, GLsizeiptr size);
+	VBO(std::vector<GLfloat> _vector, GLsizeiptr size);
 	VBO(std::vector<Vertex>& vertices);
+
+	void updateData(GLintptr offset, GLuint noElements, GLfloat* data);
 
 	// Bind le VBO
 	void Bind();

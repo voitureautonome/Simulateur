@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="EBO.cpp" />
+    <ClCompile Include="gamepad.c" />
     <ClCompile Include="glad.c" />
     <ClCompile Include="libs\imguilib\imgui.cpp" />
     <ClCompile Include="libs\imguilib\imgui_demo.cpp" />
@@ -176,6 +177,7 @@
   <ItemGroup>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="EBO.h" />
+    <ClInclude Include="gamepad.h" />
     <ClInclude Include="Model.h" />
     <ClInclude Include="raycast.h" />
     <ClInclude Include="libs\imguilib\imconfig.h" />

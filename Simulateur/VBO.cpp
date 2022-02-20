@@ -6,7 +6,7 @@ VBO::VBO(GLfloat* vertices, GLsizeiptr size)
 	this->vector = NULL;
 	glGenBuffers(1, &ID);
 	glBindBuffer(GL_ARRAY_BUFFER, ID);
-	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, size, vertices, GL_DYNAMIC_DRAW);
 }
 // constructeur qui genere un VBO a partir de la reference d'un vector
 VBO::VBO(std::vector<GLfloat> *_vector, GLsizeiptr size)
@@ -17,13 +17,24 @@ VBO::VBO(std::vector<GLfloat> *_vector, GLsizeiptr size)
 	glBufferData(GL_ARRAY_BUFFER, size, &VBO::vector->data()[0], GL_DYNAMIC_DRAW);
 }
 
+VBO::VBO(std::vector<GLfloat> _vector, GLsizeiptr size)
+{
+	this->vector = &_vector;
+	glGenBuffers(1, &ID);
+	glBindBuffer(GL_ARRAY_BUFFER, ID);
+	glBufferData(GL_ARRAY_BUFFER, size, &VBO::vector->data()[0], GL_DYNAMIC_DRAW);
+}
+
 VBO::VBO(std::vector<Vertex>& vertices)
 {
 	glGenBuffers(1, &ID);
 	glBindBuffer(GL_ARRAY_BUFFER, ID);
-	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex), vertices.data(), GL_DYNAMIC_DRAW);
 }
 
+void VBO::updateData(GLintptr offset, GLuint noElements, GLfloat* data) {
+	glBufferSubData(GL_ARRAY_BUFFER, offset, noElements * sizeof(GLfloat), data);
+}
 // Bind le VBO
 void VBO::Bind()
 {

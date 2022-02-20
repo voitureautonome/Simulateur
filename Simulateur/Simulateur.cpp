@@ -28,6 +28,7 @@
 #include "Model.h"
 #include "raycast.h"
 #include "Voiture.h"
+
 void tournerVecteur(glm::vec2 *v, float angle) {
 	float x2 = v->x * cos(angle) - v->y * sin(angle);
 	float y2 = v->x * sin(angle) + v->y * cos(angle);
@@ -95,21 +96,7 @@ const unsigned int height = 800;
 
 int main()
 {
-	Line::initLines();
-	Line::drawLine(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.f, 0.0f, 0.0f), ImVec4(1.f, 2.f, 3.f,1.f));
-	Line::drawLine(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.f, 1.0f, 0.0f), ImVec4(1.f, 2.f, 3.f, 1.f));
-	Line::drawLine(glm::vec3(0.f, 0.f, 0.0f), glm::vec3(-0.2f, 0.5f, 0.0f), ImVec4(1.f, 2.f, 3.f, 1.f));
-	Line::drawLine(glm::vec3(1.f, 0.5f, 0.0f), glm::vec3(-0.2f, 0.5f, 0.0f), ImVec4(1.f, 2.f, 3.f, 1.f)); //up
 
-	//Line::drawLine(glm::vec2(0.f, 0.0f), glm::vec2(0.0f, -0.9f), ImVec4(1.f, 2.f, 3.f, 1.f));
-	Line::drawLine(glm::vec3(0.99f, 0.0f, 0.0f), glm::vec3(0.99f, -0.9f, 0.0f), ImVec4(1.f, 2.f, 3.f, 1.f));
-	Line::drawLine(glm::vec3(0.0f, -0.9f, 0.0f), glm::vec3(1.f, -0.9f, 0.0f), ImVec4(1.f, 2.f, 3.f, 1.f));
-	glm::vec2 dir = glm::vec2(1.f, 1.f);
-	tournerVecteur(&dir, 0.1f);
-	//glm::vec2 res = rayCast(glm::vec2(1.f,0.5f), glm::vec2(-0.2f,0.5f), glm::vec2(0.f,0.f), dir);
-	//Line::drawLine(glm::vec3(0.f, 0.f,0.0f), glm::vec3(res.x,res.y,0.0f), ImVec4(1.f, 1.f, 1.f, 1.f));
-
-	//Line::drawLine(glm::vec2(0.0f, 0.5f), glm::vec2(0.5, 0.0f), ImVec4(1.f, 2.f, 3.f, 1.f));
 
 	// Initialize GLFW
 	glfwInit();
@@ -194,7 +181,7 @@ int main()
 	glm::vec3 labyPos = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::mat4 labyModel = glm::mat4(1.0f);
 	labyModel = glm::translate(labyModel, labyPos);
-	glm::vec3 triPos = glm::vec3(0.0f, 2.0f, 0.0f);
+	glm::vec3 triPos = glm::vec3(0.0f, 0.0f, 0.0f);
 	glm::mat4 triModel = glm::mat4(1.0f);
 	triModel = glm::translate(triModel, triPos);
 	//triModel = glm::rotate(triModel, glm::radians(45.f), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -211,16 +198,7 @@ int main()
 
 
 
-	Shader shaderLigne("ligne.vert", "ligne.frag");
-	VAO VAO2;
-	VAO2.Bind();
-	VBO VBO2(&Line::listeLignes.data()[0], Line::listeLignes.size()*sizeof(GLfloat));
-	EBO EBO2(&Line::listeIndices.data()[0], ((unsigned long long) Line::number) * 2 * sizeof(GLuint));
 	
-	VAO2.LinkVBO(VBO2, 0);
-	VAO2.Unbind();
-	VBO2.Unbind();
-	EBO2.Unbind();
 	//HideConsole(); // c'est un GUI on cache la console si tout charge bien
 
 
@@ -245,14 +223,49 @@ int main()
 
 	Model model("models/laby/scene.gltf");
 	Model voit("models/car/car.gltf");
+	Model uv("models/uv/uv.gltf");
+	glm::translate(uv.model, glm::vec3(0.f, 2.f, 0.f));
+	uv.position = model.meshes[0].vertices[0].position;
 	Voiture car(20.f);
 
 	glEnable(GL_DEPTH_TEST);
 
 	Camera camera(width, height, glm::vec3(0.0f, 2.0f, 2.0f));
 
+	const int nb = model.meshes.size();
+	int count = 0;
+	for (size_t i = 0; i < nb; i++)
+	{
+		for (size_t j = 0; j < model.meshes[i].vertices.size(); j++)
+		{
+			//std::cout << "------------------" << std::endl;
+			//std::cout << model.meshes[i].vertices[j].position.x << std::endl;
+			const int indice = model.meshes[i].indices[j];
+			std::cout << "INDICE : " << indice << std::endl;
+
+			std::cout << glm::to_string(model.meshes[i].vertices[indice].position) << std::endl;
+			count++;
+		}
+	}
+	std::cout << "count : " << count << std::endl;
+
+	Line ligne;
+	ligne.drawLine(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(1.f, 0.0f, 0.0f));
+	ligne.drawLine(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.f, 1.0f, 0.0f));
+	ligne.drawLine(glm::vec3(0.f, 0.f, 0.0f), glm::vec3(-0.2f, 0.5f, 0.0f));
+	ligne.drawLine(glm::vec3(1.f, 0.5f, 0.0f), glm::vec3(-0.2f, 0.5f, 0.0f)); //up
+
+	ligne.drawLine(glm::vec3(0.99f, 0.0f, 0.0f), glm::vec3(0.99f, -0.9f, 0.0f));
+	ligne.drawLine(glm::vec3(0.0f, -0.9f, 0.0f), glm::vec3(1.f, -0.9f, 0.0f));
+
+	glm::vec2 dir = glm::vec2(1.f, 1.f);
+	tournerVecteur(&dir, 0.1f);
+	//glm::vec2 res = rayCast(glm::vec2(1.f,0.5f), glm::vec2(-0.2f,0.5f), glm::vec2(0.f,0.f), dir);
+	//ligne.drawLine(glm::vec3(0.f, 0.f,0.0f), glm::vec3(res.x,res.y,0.0f), ImVec4(1.f, 1.f, 1.f, 1.f));
+
 	while (!glfwWindowShouldClose(window))
 	{
+		
 		processInput(window);
 		//ImGui::IsMouseHoveringRect(ImVec2(0, 0), ImVec2(ImGui::GetIO().DisplaySize.x, 24));
 
@@ -289,18 +302,16 @@ int main()
 		light.Draw(lightShader,camera,lightModel);	
 		model.Draw(shaderProgram,camera);
 		car.Draw(shaderProgram, camera);
+		uv.Draw(shaderProgram, camera);
 		//voit.Draw(shaderProgram, camera);
 		//voit.Draw(shaderProgram, camera);
 		glUniformMatrix4fv(glGetUniformLocation(shaderProgram.ID, "model"), 1, GL_FALSE, glm::value_ptr(triModel));
 		triAngle.Draw(shaderProgram,camera);
+		ligne.Draw(camera);
 		
 		
 		//VAO1.Unbind();
-		VAO2.Bind();
-		shaderLigne.Activate();
-		glDrawElements(GL_LINES, Line::number*2, GL_UNSIGNED_INT,0);
-		VAO2.Unbind();
-		//Line::drawLine(glm::vec2(0.4f, 2.0f), glm::vec2(0.1f, 0.05f), ImVec4(1.f, 2.f, 3.f, 1.f));
+		//ligne.drawLine(glm::vec2(0.4f, 2.0f), glm::vec2(0.1f, 0.05f), ImVec4(1.f, 2.f, 3.f, 1.f));
 
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -392,7 +403,6 @@ int main()
 	}
 	shaderProgram.Delete();
 	lightShader.Delete();
-	shaderLigne.Delete();
 	// Delete window before ending the program
 	glfwDestroyWindow(window);
 	// Terminate GLFW before ending the program
