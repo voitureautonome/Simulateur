@@ -1,5 +1,6 @@
 #include "raycast.h"
 
+
 float intersection(float a1, float b1, float a2, float b2) {
 	// On cherche à trouver où les droites se croisent donc à résoudre a1x + b1 = a2x + b2 
 	// on pose l'équation (a1x + b1) - (a2x + b2) = 0
@@ -22,10 +23,26 @@ bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDire
 
 	// equation de droite ax + b
 
-	// coefficient directeur de la droite représentant le mur
-	float a1 = (y2 - y1) / (x2 - x1);
-	// coefficient directeur de la droite représentant le rayon
-	float a2 = (y4 - y3) / (x4 - x3);
+	float a1, a2;
+	// Si la droite est verticale, on met le coeff directeur au max
+	if (x2 - x1 == 0)
+	{
+		a1 = 107374176;
+	}
+	else {
+		// coefficient directeur de la droite représentant le mur
+		a1 = (y2 - y1) / (x2 - x1);
+	}
+	// Si la droite est verticale, on met le coeff directeur au max
+	if (x4 - x3 == 0)
+	{
+		a2 = 107374176;
+	}
+	else {
+		// coefficient directeur de la droite représentant le rayon
+		a2 = (y4 - y3) / (x4 - x3);
+	}
+
 
 	// Si les deux droites ont le même coeff directeur, elles sont parallèles
 	if (a1 == a2)
@@ -34,8 +51,8 @@ bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDire
 	}
 
 	// Sinon on calcule leur ordonné à l'origine
-	float b1 = y1 - a1 * x1;
-	float b2 = y3 - a2 * x3;
+	float b1 = y1 - (a1 * x1);
+	float b2 = y3 - (a2 * x3);
 
 	// On a alors deux droites a1x + b1 et a2x + b2
 	// On cherche pour quelle valeur de X elles se croisent
@@ -44,9 +61,24 @@ bool rayCast(glm::vec2 wp1, glm::vec2 wp2, glm::vec2 rayStart, glm::vec2 rayDire
 	// On remplace dans l'équation d'une des deux droites les coordonnées
 	float resY = a1 * resX + b1;
 
-	// On crée un vecteur avec les coordonnées de l'intersection, et on le met dans le résultat
-	res = glm::vec2(resX, resY);
-	return true;
+	// Pour savoir si l'intersection se trouve dans le segment, on teste le produit scalaire pour savoir si AB.AC < AB.AB 
+	// Si c'est le cas, le point est dans le segment
+
+	glm::vec2 segmentAB = wp1 - wp2;
+	glm::vec2 segmentAC = wp1 - glm::vec2(resX, resY);
+
+	float prodSegmentAB = glm::dot(segmentAB, segmentAB);
+	float prodSegmentAC = glm::dot(segmentAB, segmentAC);
+
+	if (prodSegmentAC <= prodSegmentAB && prodSegmentAC >= 0)
+	{
+		// On crée un vecteur avec les coordonnées de l'intersection, et on le met dans le résultat
+		res = glm::vec2(resX, resY);
+		return true;
+	}
+	else
+		return false;
+
 }
 
 float distance(glm::vec2 A, glm::vec2 B) {
@@ -60,13 +92,21 @@ float rayCastTriangle(triangle tri, glm::vec2 rayStart, glm::vec2 rayDirection) 
 	glm::vec2 pointB = glm::vec2(tri.angle[1].x, tri.angle[1].z);
 	glm::vec2 pointC = glm::vec2(tri.angle[2].x, tri.angle[2].z);
 
+	std::cout << "POINT A " << glm::to_string(pointA) << std::endl;
+	std::cout << "POINT B " << glm::to_string(pointB) << std::endl;
+	std::cout << "POINT C " << glm::to_string(pointC) << std::endl;
+
 	glm::vec2 res = glm::vec2(-999.f, -999.f);
 	glm::vec2 resAB, resAC, resBC;
 	float longueur = 1000000.f;
 	// On vérifie le côté du triangle AB
 	if (rayCast(pointA, pointB, rayStart, rayDirection, resAB)) {
 		float dist = distance(rayStart, resAB);
+		std::cout << "=====================================" << std::endl;
+
 		std::cout << "resultat AB : " << glm::to_string(resAB) << std::endl;
+		std::cout << "distance AB : " << dist << std::endl;
+
 		if (dist < longueur)
 		{
 			res = resAB;
@@ -76,6 +116,10 @@ float rayCastTriangle(triangle tri, glm::vec2 rayStart, glm::vec2 rayDirection) 
 	// On vérifie le côté du triangle AC
 	if (rayCast(pointA, pointC, rayStart, rayDirection, resAC)) {
 		float dist = distance(rayStart, resAC);
+		std::cout << "=====================================" << std::endl;
+		std::cout << "resultat AC : " << glm::to_string(resAC) << std::endl;
+		std::cout << "distance AC : " << dist << std::endl;
+
 		if (dist < longueur)
 		{
 			res = resAC;
@@ -85,6 +129,11 @@ float rayCastTriangle(triangle tri, glm::vec2 rayStart, glm::vec2 rayDirection) 
 	// On vérifie le côté du triangle BC
 	if (rayCast(pointB, pointC, rayStart, rayDirection, resBC)) {
 		float dist = distance(rayStart, resBC);
+		std::cout << "=====================================" << std::endl;
+		std::cout << "resultat BC : " << glm::to_string(resBC) << std::endl;
+		std::cout << "distance BC : " << dist << std::endl;
+
+
 		if (dist < longueur)
 		{
 			res = resBC;
@@ -179,11 +228,11 @@ int testRaycast() {
 	std::cout << "coordonnee z : " << model[3].z <<std::endl;
 	*/
 
-	Vertex triangle[] = {
-	Vertex{glm::vec3(-1.0f, 0.f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
-	Vertex{glm::vec3(-1.0f, 0.f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
-	Vertex{glm::vec3(1.0f, 0.f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)}
-	};
+	//Vertex triangle[] = {
+	//Vertex{glm::vec3(-1.0f, 0.f, 1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 0.0f)},
+	//Vertex{glm::vec3(-1.0f, 0.f, -1.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(0.0f, 1.0f)},
+	//Vertex{glm::vec3(1.0f, 0.f, -2.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(1.0f, 1.0f, 1.0f), glm::vec2(1.0f, 1.0f)}
+	//};
 
 	glm::vec2 origine2D = glm::vec2(2.f, 1.f);
 	glm::vec2 dir2D = glm::vec2(-1.f, -1.f);
@@ -200,13 +249,36 @@ int testRaycast() {
 	glm::vec2 c = glm::vec2(2, 4);
 	glm::vec2 direction = glm::normalize(glm::vec2(1, -1));
 
-	glm::vec2 res;
+	glm::vec2 c2 = glm::vec2(0, 2);
 
-	std::cout << "Intersection ? " << rayCast(a, b, c, direction, res) << std::endl;
+
+	glm::vec2 res, res2;
+
+	std::cout << "Test qui doit marcher Intersection ? " << rayCast(a, b, c, direction, res) << std::endl;
 	if (rayCast(a, b, c, direction, res))
 	{
 		std::cout << "Ou ? " << glm::to_string(res) << std::endl;
 	}
+
+	std::cout << "Test qui doit pas marcher Intersection ? " << rayCast(a, b, c2, direction, res2) << std::endl;
+	if (rayCast(a, b, c2, direction, res2))
+	{
+		std::cout << "Ou ? " << glm::to_string(res2) << std::endl;
+	}
+
+	triangle t;
+
+	t.angle[0] = glm::vec3(2, 0, 2);
+	t.angle[1] = glm::vec3(2, 2, 2);
+	t.angle[2] = glm::vec3(2, 0, -2);
+
+	glm::vec3 origine = glm::vec3(0, 0.5, 0);
+	glm::vec3 direction2 = glm::vec3(1, 0, 0);
+
+	float longueur = rayCastTriangle(t, origine, direction2);
+
+	std::cout << "Distance du triangle " << longueur << std::endl;
+
 
 	//rayCastTriangle(triangle, origine2D, dir2D);
 
