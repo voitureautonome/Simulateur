@@ -10,3 +10,4 @@
 /Simulateur/libs/glfw/build
 /Simulateur/x64/Debug
 /Simulateur/x64/Release
+x64/Debug/*
