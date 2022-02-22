@@ -57,5 +57,7 @@ void Line::Clear() {
 	/* on renvoit dans la memoire du GPU notre VBO rempli de 0 
 	*/
 	glBufferSubData(GL_ARRAY_BUFFER, 0, this->number * 3 * sizeof(GLfloat) * sizeof(GLfloat), lignes);
+	this->number = 0;
+	this->count = 0;
 	this->VBO2->Unbind();
 }
